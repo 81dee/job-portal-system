@@ -1,0 +1,117 @@
+.recruiter-page {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* FORM */
+.job-form-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.job-form-card h3 {
+  margin-bottom: 10px;
+}
+
+.job-form-card input,
+.job-form-card textarea {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.job-form-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* APPLICATIONS */
+.applications-section {
+  margin-top: 20px;
+}
+
+.app-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.right-section {
+  text-align: right;
+}
+
+/* STATUS */
+.status {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.status.pending {
+  background: orange;
+}
+
+.status.accepted {
+  background: green;
+}
+
+.status.rejected {
+  background: red;
+}
+
+/* BUTTONS */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.accept {
+  background: green;
+  color: white;
+}
+
+.reject {
+  background: red;
+  color: white;
+}
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  color: #666;
+}

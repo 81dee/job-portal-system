@@ -1,5 +1,6 @@
 import { useState } from "react";
 import API from "../services/api";
+import Loader from "../components/Loader";
 
 export default function Login() {
   const [email, setEmail] = useState("");

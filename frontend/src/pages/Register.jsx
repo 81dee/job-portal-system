@@ -1,5 +1,6 @@
 import { useState } from "react";
 import API from "../services/api";
+import Loader from "../components/Loader";
 
 export default function Register() {
   const [form, setForm] = useState({});

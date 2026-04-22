@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import "../assets/styles/jobs.css";
+import Loader from "../components/Loader";
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
@@ -31,20 +32,24 @@ export default function Jobs() {
     }
   };
 
-  if (loading) return <p>Loading jobs...</p>;
+  if (loading) return <Loader />;
 
   return (
-   <div className="jobs-container">
-      {jobs.map((job) => (
-      <div className="job-card" key={job._id}>
-         <h3>{job.title}</h3>
-         <p>{job.description}</p>
+   <div className="jobs-page">
+    <h2 className="page-title">Available Jobs</h2>
 
-        <button onClick={() => applyJob(job._id)}>
-           Apply
-        </button>
+    <div className="jobs-grid">
+      {jobs.map((job) => (
+        <div className="job-card" key={job._id}>
+          <h3>{job.title}</h3>
+          <p>{job.description}</p>
+
+          <button onClick={() => applyJob(job._id)}>
+            Apply Now
+          </button>
+        </div>
+       ))}
       </div>
-  ))}
    </div>
   );
 }

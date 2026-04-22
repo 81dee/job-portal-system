@@ -1,0 +1,79 @@
+.home-container {
+  width: 100%;
+  height: calc(100vh - 70px); /* minus navbar height */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.hero {
+  max-width: 700px;
+  text-align: center;
+  padding: 20px;
+}
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.hero span {
+  color: #ffd700;
+}
+
+.hero p {
+  font-size: 18px;
+  margin-bottom: 25px;
+  color: #f0f0f0;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn {
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+/* primary */
+.primary {
+  background: #ff7a18;
+  color: white;
+}
+
+/* secondary */
+.secondary {
+  background: white;
+  color: #333;
+}
+
+.hero {
+  animation: fadeUp 1s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero h1 {
+  font-size: 56px;
+  text-shadow: 0 0 20px rgba(255,255,255,0.2);
+}

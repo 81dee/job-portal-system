@@ -1,10 +1,48 @@
-.dashboard {
+.dashboard-page {
+  max-width: 800px;
+  margin: auto;
   padding: 20px;
 }
 
-.card {
-  background: white;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 5px;
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.dashboard-card {
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 12px;
+
+  display: flex;
+  justify-content: space-between;
+
+  backdrop-filter: blur(10px);
+}
+
+/* STATUS COLORS */
+.status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+}
+
+.status.pending {
+  background: orange;
+}
+
+.status.accepted {
+  background: green;
+}
+
+.status.rejected {
+  background: red;
+}
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  color: #666;
 }

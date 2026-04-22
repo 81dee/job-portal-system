@@ -1,30 +1,53 @@
-# Job Portal System
+#  Job Portal System (MERN Stack)
 
-A full-stack job portal application built using MERN stack.
+A full-stack job portal web application where jobseekers can apply for jobs and recruiters can manage applications.
 
-## Features
-- User Authentication
-- Job Posting
-- Job Application
-- Recruiter Dashboard
+---
+
+##  Features
+
+###  User (Jobseeker)
+- Register & Login
+- View jobs
+- Apply for jobs
+- Track application status
+
+###  Recruiter
+- Post jobs
+- View applications
+- Accept / Reject candidates
+- Dashboard stats
+
+---
 
 ## Tech Stack
-- React
-- Node.js
-- Express
-- MongoDB
 
-## How to Run
+- Frontend: React (Vite)
+- Backend: Node.js + Express
+- Database: MongoDB Atlas
+- Auth: JWT
 
-### Backend
-cd backend  
-npm install  
-npm run dev  
+---
 
-### Frontend
-cd frontend  
-npm install  
-npm run dev  
+## ⚙️ Installation
 
-## Author
+### 1️⃣ Backend
+cd backend
+npm install
+npm run dev
+
+### 2 Frontend
+ cd frontend
+npm install
+npm run dev
+
+### Api Base URL
+
+http://localhost:3000/api
+
+### Screenshot
+
+![alt text](image.png)
+
+### Author
 Deepak Singh

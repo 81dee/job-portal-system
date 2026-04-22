@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../services/api";
+import Loader from "../components/Loader";
+import "../assets/styles/recruiter.css";
 
 export default function Recruiter() {
   const [title, setTitle] = useState("");
@@ -51,47 +53,68 @@ export default function Recruiter() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Recruiter Panel</h2>
+    <div className="recruiter-page">
+      <h2 className="page-title">Recruiter Panel</h2>
 
-      {/* Create Job Section */}
-      <div style={{ marginBottom: "20px" }}>
+      {/* CREATE JOB */}
+      <div className="job-form-card">
+        <h3>Create Job</h3>
+
         <input
           placeholder="Job Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <input
-          placeholder="Description"
+
+        <textarea
+          placeholder="Job Description"
+          rows="3"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+
         <button onClick={createJob}>Create Job</button>
       </div>
 
-      <hr />
+      {/* APPLICATIONS */}
+      <div className="applications-section">
+        <h3>Applications</h3>
 
-      {/* Applications List */}
-      <h3>Applications</h3>
-      {applications.length === 0 ? (
-        <p>No applications found.</p>
-      ) : (
-        applications.map((app) => (
-          <div key={app._id} style={{ border: "1px solid #ccc", padding: "10px", margin: "10px 0" }}>
-            <p><strong>Candidate:</strong> {app.user?.name || "N/A"}</p>
-            <p><strong>Job:</strong> {app.job?.title || "N/A"}</p>
-            <p><strong>Status:</strong> {app.status}</p>
+        {applications.length === 0 ? (
+          <p className="empty">No applications found</p>
+        ) : (
+          applications.map((app) => (
+            <div className="app-card" key={app._id}>
+              <div>
+                <strong>{app.user?.name}</strong>
+                <p>{app.job?.title}</p>
+              </div>
 
-            <button onClick={() => updateStatus(app._id, "accepted")}>Accept</button>
-            <button 
-              onClick={() => updateStatus(app._id, "rejected")} 
-              style={{ marginLeft: "10px", color: "red" }}
-            >
-              Reject
-            </button>
-          </div>
-        ))
-      )}
+              <div className="right-section">
+                <span className={`status ${app.status}`}>
+                  {app.status}
+                </span>
+
+                <div className="action-buttons">
+                  <button
+                    className="accept"
+                    onClick={() => updateStatus(app._id, "accepted")}
+                  >
+                    Accept
+                  </button>
+
+                  <button
+                    className="reject"
+                    onClick={() => updateStatus(app._id, "rejected")}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
