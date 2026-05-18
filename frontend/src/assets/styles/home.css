@@ -1,79 +1,392 @@
-.home-container {
-  width: 100%;
-  height: calc(100vh - 70px); /* minus navbar height */
+/* HOME */
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+.home {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-.hero {
-  max-width: 700px;
-  text-align: center;
-  padding: 20px;
+/* HERO */
+
+.hero-section {
+    min-height: 90vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 40px;
+
+    background:
+      linear-gradient(
+        135deg,
+        #667eea 0%,
+        #764ba2 100%
+      );
+
+    position: relative;
 }
 
-.hero h1 {
-  font-size: 56px;
-  font-weight: bold;
-  margin-bottom: 15px;
+/* OVERLAY GLOW */
+
+.hero-section::before {
+    content: "";
+
+    position: absolute;
+    width: 500px;
+    height: 500px;
+
+    background: rgba(255,255,255,0.1);
+
+    filter: blur(120px);
+
+    top: -100px;
+    right: -100px;
+
+    border-radius: 50%;
 }
 
-.hero span {
-  color: #ffd700;
+/* CONTENT */
+
+.hero-content {
+    max-width: 850px;
+    text-align: center;
+    color: white;
+    z-index: 2;
+
+    animation: fadeUp 1s ease;
 }
 
-.hero p {
-  font-size: 18px;
-  margin-bottom: 25px;
-  color: #f0f0f0;
+/* TITLE */
+
+.hero-content h1 {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    margin-bottom: 25px;
+
+    text-shadow:
+      0 8px 30px rgba(0,0,0,0.2);
 }
+
+.hero-content span {
+    color: #ffd700;
+}
+
+/* DESCRIPTION */
+
+.hero-content p {
+    font-size: 20px;
+    line-height: 1.8;
+
+    color: rgba(255,255,255,0.9);
+
+    margin-bottom: 40px;
+}
+
+/* SEARCH */
+
+.search-box {
+    width: 100%;
+    max-width: 700px;
+
+    margin: auto;
+    margin-bottom: 35px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    box-shadow:
+      0 10px 40px rgba(0,0,0,0.15);
+}
+
+.search-icon {
+    color: #666;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+.search-box input {
+    flex: 1;
+
+    border: none;
+    outline: none;
+
+    padding: 16px;
+
+    font-size: 16px;
+}
+
+.search-box button {
+    padding: 14px 28px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+      linear-gradient(
+        to right,
+        #4f46e5,
+        #9333ea
+      );
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+.search-box button:hover {
+    transform: scale(1.05);
+}
+
+/* BUTTONS */
 
 .hero-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
+
+/* BUTTON */
 
 .btn {
-  padding: 12px 22px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
+    padding: 15px 30px;
+
+    border: none;
+
+    border-radius: 16px;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
 }
 
-/* primary */
+/* PRIMARY */
+
 .primary {
-  background: #ff7a18;
-  color: white;
+    background:
+      linear-gradient(
+        to right,
+        #ff7a18,
+        #ff3d81
+      );
+
+    color: white;
+
+    box-shadow:
+      0 10px 30px rgba(255,61,129,0.3);
 }
 
-/* secondary */
+.primary:hover {
+    transform: translateY(-4px);
+}
+
+/* SECONDARY */
+
 .secondary {
-  background: white;
-  color: #333;
+    background: white;
+    color: #333;
 }
 
-.hero {
-  animation: fadeUp 1s ease;
+.secondary:hover {
+    background: #f3f4f6;
 }
+
+/* REGISTER */
+
+.register {
+    background: #111827;
+    color: rgba(255, 255, 255, 0.752);
+}
+
+.register:hover {
+    background: #000;
+}
+
+/* STATS */
+
+.stats-section {
+    padding: 80px 40px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+
+    gap: 30px;
+
+    background: #f8fafcbe;
+}
+
+/* CARD */
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.536);
+
+    padding: 40px;
+
+    border-radius: 24px;
+
+    text-align: center;
+
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.08);
+
+    transition: 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+}
+
+.stat-icon {
+    font-size: 45px;
+    margin-bottom: 20px;
+}
+
+.blue {
+    color: #2563eb;
+}
+
+.purple {
+    color: #7c3aed;
+}
+
+.orange {
+    color: #ea580c;
+}
+
+.stat-card h2 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.stat-card p {
+    color: #666;
+    font-size: 17px;
+}
+
+/* CATEGORIES */
+
+.categories-section {
+    padding: 90px 40px;
+
+    background:
+      linear-gradient(
+        to bottom,
+        #ffffffdd,
+        #eef2ff
+      );
+}
+
+.categories-section h2 {
+    text-align: center;
+
+    font-size: 48px;
+    font-weight: 800;
+
+    margin-bottom: 60px;
+
+    color: #222;
+}
+
+/* GRID */
+
+.categories-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(auto-fit, minmax(220px,1fr));
+
+    gap: 25px;
+
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* CATEGORY CARD */
+
+.category-card {
+    background: rgba(27, 41, 130, 0.437);
+
+    padding: 35px;
+
+    border-radius: 24px;
+
+    text-align: center;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.08);
+
+    transition: 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-8px) scale(1.03);
+
+    background:
+      linear-gradient(
+        to right,
+        #4f46e5,
+        #9233ead1
+      );
+
+    color: white;
+}
+
+/* ANIMATION */
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.hero h1 {
-  font-size: 56px;
-  text-shadow: 0 0 20px rgba(255,255,255,0.2);
+/* RESPONSIVE */
+
+@media(max-width: 768px) {
+
+    .hero-content h1 {
+        font-size: 48px;
+    }
+
+    .hero-content p {
+        font-size: 17px;
+    }
+
+    .search-box {
+        flex-direction: column;
+    }
+
+    .search-box button {
+        width: 100%;
+    }
 }

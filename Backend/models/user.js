@@ -12,7 +12,29 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["jobseeker", "recruiter", "admin"],
     default: "jobseeker",
-  }
+  },
+
+  mobileNumber: {
+     type: String
+  },
+
+  location: {
+    city: String,
+    state: String,
+    country: String,
+    pincode: String
+  },
+
+  socialLinks: {
+     linkedin: String,
+     github: String,
+     portfolio: String
+  },
+
+  savedJobs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Job"
+  }]
 
 }, { timestamps: true });
 

@@ -1,48 +1,222 @@
+/* PAGE */
+
 .dashboard-page {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
+
+    min-height: 100vh;
+
+    padding: 60px 40px;
+
+    background:
+      linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+      );
 }
 
-.dashboard-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+/* HEADER */
+
+.dashboard-header {
+
+    text-align: center;
+
+    margin-bottom: 50px;
 }
 
-.dashboard-card {
-  background: rgba(255,255,255,0.05);
-  padding: 20px;
-  border-radius: 12px;
+.dashboard-header h1 {
 
-  display: flex;
-  justify-content: space-between;
+    font-size: 56px;
 
-  backdrop-filter: blur(10px);
+    color: white;
+
+    margin-bottom: 15px;
+}
+
+.dashboard-header p {
+
+    color: rgba(255,255,255,0.85);
+
+    font-size: 18px;
+}
+
+/* STATS */
+
+.dashboard-stats {
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(auto-fit, minmax(250px,1fr));
+
+    gap: 25px;
+
+    margin-bottom: 50px;
+}
+
+/* BOX */
+
+.stat-box {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 24px;
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.15);
+
+    transition: 0.3s ease;
+}
+
+.stat-box:hover {
+
+    transform: translateY(-8px);
+}
+
+.stat-box svg {
+
+    font-size: 42px;
+}
+
+.stat-box h2 {
+
+    font-size: 34px;
+
+    color: #111827;
+}
+
+.stat-box p {
+
+    color: #666;
+}
+
+/* ICON COLORS */
+
+.blue {
+    color: #2563eb;
+}
+
+.green {
+    color: #16a34a;
+}
+
+.orange {
+    color: #ea580c;
+}
+
+.red {
+    color: #dc2626;
+}
+
+/* APPLICATIONS */
+
+.applications-section {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 25px;
+}
+
+/* CARD */
+
+.application-card {
+
+    background: white;
+
+    border-radius: 28px;
+
+    padding: 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.15);
+
+    transition: 0.3s ease;
+}
+
+.application-card:hover {
+
+    transform: translateY(-5px);
+}
+
+/* LEFT */
+
+.application-left h2 {
+
+    color: #111827;
+
+    margin-bottom: 10px;
+
+    font-size: 28px;
+}
+
+.application-left p {
+
+    color: #6b7280;
+
+    font-size: 17px;
+}
+
+/* STATUS */
+
+.status {
+
+    padding: 12px 22px;
+
+    border-radius: 50px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    color: white;
 }
 
 /* STATUS COLORS */
-.status {
-  padding: 5px 12px;
-  border-radius: 20px;
-  color: white;
-  font-size: 12px;
+
+.accepted {
+
+    background: #16a34a;
 }
 
-.status.pending {
-  background: orange;
+.pending {
+
+    background: #f59e0b;
 }
 
-.status.accepted {
-  background: green;
+.rejected {
+
+    background: #dc2626;
 }
 
-.status.rejected {
-  background: red;
-}
+/* RESPONSIVE */
 
-/* EMPTY */
-.empty {
-  text-align: center;
-  color: #666;
+@media(max-width: 768px) {
+
+    .dashboard-header h1 {
+
+        font-size: 40px;
+    }
+
+    .application-card {
+
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 20px;
+    }
+
+    .status {
+
+        width: 100%;
+        text-align: center;
+    }
 }

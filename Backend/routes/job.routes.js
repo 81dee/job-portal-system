@@ -1,5 +1,5 @@
 import express from "express";
-import { createJob, getJobs } from "../controllers/job.controller.js";
+import { createJob, getRecruiterJobs, deleteJob, getJobs, updateJob } from "../controllers/job.controller.js";
 import { protect } from "..//middlewares/auth.middleware.js";
 import { authorizeRoles } from "..//middlewares/role.middleware.js";
 
@@ -10,5 +10,11 @@ router.post("/create", protect, authorizeRoles("recruiter"), createJob);
 
 // anyone can viewjobs
 router.get("/", getJobs);
+
+router.put("/update/:id", updateJob);
+
+router.get("/recruiter-jobs", getRecruiterJobs);
+
+router.delete("/delete/:id", deleteJob);
 
 export default router;

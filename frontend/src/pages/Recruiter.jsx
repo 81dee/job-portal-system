@@ -1,120 +1,311 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import API from "../services/api";
-import Loader from "../components/Loader";
+
+import {
+  FaTrash,
+  FaBriefcase,
+  FaPlusCircle,
+  FaEdit
+} from "react-icons/fa";
+
 import "../assets/styles/recruiter.css";
 
 export default function Recruiter() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [applications, setApplications] = useState([]);
 
-  // 1. IMPROVED: Function defined inside useEffect to avoid cascading render warnings
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const res = await API.get("/application/recruiter");
-        // Ensure data is an array before setting state
-        setApplications(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        console.error("Fetch Error:", err);
-      }
-    };
+  const [jobs, setJobs] = useState([]);
 
-    fetchApplications();
-  }, []); // Empty dependency array means this runs ONLY ONCE on mount
+  const [editingId, setEditingId] = useState(null);
 
-  // 2. Job Creation Logic
-  const createJob = async () => {
-    if (!title || !description) return alert("Please fill all fields");
-    
+  const [formData, setFormData] = useState({
+
+    title: "",
+    description: "",
+    category: "",
+    workMode: "",
+    companyName: "",
+    salary: ""
+
+  });
+
+  // FETCH JOBS
+  const fetchRecruiterJobs = async () => {
+
     try {
-      await API.post("/job/create", { title, description });
-      alert("Job created ✅");
-      setTitle(""); // Clear input
-      setDescription(""); // Clear input
-    } catch (err) {
-      alert("Error creating job", err);
+
+      const res = await API.get("/job/recruiter-jobs");
+
+      setJobs(res.data);
+
+    } catch (error) {
+
+      console.log(error);
     }
   };
 
-  // 3. Status Update Logic
-  const updateStatus = async (id, status) => {
+  // USE EFFECT
+  useEffect(() => {
+
+    fetchRecruiterJobs();
+
+  }, []);
+
+  // HANDLE CHANGE
+  const handleChange = (e) => {
+
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // EDIT JOB
+  const editJob = (job) => {
+
+    setEditingId(job._id);
+
+    setFormData({
+
+      title: job.title || "",
+      description: job.description || "",
+      category: job.category || "",
+      workMode: job.workMode || "",
+      companyName: job.companyName || "",
+      salary: job.salary || ""
+
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  // SUBMIT
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
     try {
-      await API.put(`/application/status/${id}`, { status });
-      alert("Updated ✅");
-      
-      // IMPROVEMENT: Update the local state instead of a full re-fetch to save bandwidth
-      setApplications((prev) =>
-        prev.map((app) => (app._id === id ? { ...app, status } : app))
-      );
-    } catch (err) {
-      alert("Error updating status", err);
+
+      if (editingId) {
+
+        await API.put(
+          `/job/update/${editingId}`,
+          formData
+        );
+
+        alert("Job Updated");
+
+        setEditingId(null);
+
+      } else {
+
+        await API.post(
+          "/job/create",
+          formData
+        );
+
+        alert("Job Created");
+      }
+
+      // RESET
+      setFormData({
+
+        title: "",
+        description: "",
+        category: "",
+        workMode: "",
+        companyName: "",
+        salary: ""
+
+      });
+
+      fetchRecruiterJobs();
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Something went wrong");
+    }
+  };
+
+  // DELETE
+  const deleteJob = async (id) => {
+
+    try {
+
+      await API.delete(`/job/delete/${id}`);
+
+      alert("Job Deleted");
+
+      fetchRecruiterJobs();
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Delete failed");
     }
   };
 
   return (
+
     <div className="recruiter-page">
-      <h2 className="page-title">Recruiter Panel</h2>
 
-      {/* CREATE JOB */}
-      <div className="job-form-card">
-        <h3>Create Job</h3>
+      {/* TOP DASHBOARD */}
+      <div className="dashboard-top">
 
-        <input
-          placeholder="Job Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="dashboard-card">
+          <FaBriefcase />
+          <div>
+            <h2>{jobs.length}</h2>
+            <p>Total Jobs</p>
+          </div>
+        </div>
 
-        <textarea
-          placeholder="Job Description"
-          rows="3"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <div className="dashboard-card">
+          <FaPlusCircle />
+          <div>
+            <h2>
+              {editingId ? "Edit" : "Create"}
+            </h2>
+            <p>
+              {editingId ? "Update Job" : "New Opportunity"}
+            </p>
+          </div>
+        </div>
 
-        <button onClick={createJob}>Create Job</button>
       </div>
 
-      {/* APPLICATIONS */}
-      <div className="applications-section">
-        <h3>Applications</h3>
+      {/* FORM */}
+      <div className="recruiter-container">
 
-        {applications.length === 0 ? (
-          <p className="empty">No applications found</p>
-        ) : (
-          applications.map((app) => (
-            <div className="app-card" key={app._id}>
-              <div>
-                <strong>{app.user?.name}</strong>
-                <p>{app.job?.title}</p>
-              </div>
+        <h1>
+          {editingId ? "Edit Job" : "Create New Job"}
+        </h1>
 
-              <div className="right-section">
-                <span className={`status ${app.status}`}>
-                  {app.status}
-                </span>
+        <form onSubmit={handleSubmit}>
 
-                <div className="action-buttons">
-                  <button
-                    className="accept"
-                    onClick={() => updateStatus(app._id, "accepted")}
-                  >
-                    Accept
-                  </button>
+          <input
+            type="text"
+            name="title"
+            placeholder="Job Title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
 
-                  <button
-                    className="reject"
-                    onClick={() => updateStatus(app._id, "rejected")}
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
+          <textarea
+            name="description"
+            placeholder="Job Description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="text"
+            name="companyName"
+            placeholder="Company Name"
+            value={formData.companyName}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="text"
+            name="salary"
+            placeholder="Salary Package"
+            value={formData.salary}
+            onChange={handleChange}
+          />
+
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+          >
+
+            <option value="">Select Category</option>
+
+            <option>Technology</option>
+            <option>Finance</option>
+            <option>Healthcare</option>
+            <option>Marketing</option>
+
+          </select>
+
+          <select
+            name="workMode"
+            value={formData.workMode}
+            onChange={handleChange}
+          >
+
+            <option value="">Work Mode</option>
+
+            <option>Remote</option>
+            <option>Hybrid</option>
+            <option>Onsite</option>
+
+          </select>
+
+          <button type="submit">
+
+            {editingId ? "Update Job" : "Create Job"}
+
+          </button>
+
+        </form>
+
+      </div>
+
+      {/* JOBS */}
+      <div className="recruiter-jobs">
+
+        <h2>Your Posted Jobs</h2>
+
+        <div className="recruiter-jobs-grid">
+
+          {jobs.map((job) => (
+
+            <div className="recruiter-job-card" key={job._id}>
+
+              <h3>{job.title}</h3>
+
+              <p>
+                {job.description?.slice(0, 100)}...
+              </p>
+
+              <span>{job.category}</span>
+
+              {/* EDIT */}
+              <button
+                className="edit-btn"
+                onClick={() => editJob(job)}
+              >
+                <FaEdit />
+                Edit
+              </button>
+
+              {/* DELETE */}
+              <button
+                className="delete-btn"
+                onClick={() => deleteJob(job._id)}
+              >
+                <FaTrash />
+                Delete
+              </button>
+
             </div>
-          ))
-        )}
+
+          ))}
+
+        </div>
+
       </div>
+
     </div>
   );
 }

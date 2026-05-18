@@ -1,50 +1,134 @@
-import { useEffect, useState, useCallback } from "react";
-import API from "../services/api";
+import {
+  FaBriefcase,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaClock
+} from "react-icons/fa";
+
 import "../assets/styles/dashboard.css";
-import Loader from "../components/Loader";
 
 export default function Dashboard() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  // 1. Memoize the function so it doesn't change on every render
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await API.get("/application/my");
-      // 2. Add a safety check to ensure data is an array before setting state
-      setData(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
+  const applications = [
+
+    {
+      id: 1,
+      title: "Frontend Developer",
+      company: "Google",
+      status: "Pending"
+    },
+
+    {
+      id: 2,
+      title: "Backend Developer",
+      company: "Microsoft",
+      status: "Accepted"
+    },
+
+    {
+      id: 3,
+      title: "UI/UX Designer",
+      company: "Amazon",
+      status: "Rejected"
     }
-  }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]); // 3. fetchData is now a stable dependency
-
-   if (loading) return <Loader />;
+  ];
 
   return (
-  <div className="dashboard-page">
-    <h2 className="page-title">My Applications</h2>
 
-    {data.length === 0 ? (
-      <p className="empty">No applications yet</p>
-    ) : (
-      <div className="dashboard-list">
-        {data.map((item) => (
-          <div className="dashboard-card" key={item._id}>
-            <h3>{item.job?.title}</h3>
+    <div className="dashboard-page">
 
-            <span className={`status ${item.status}`}>
-              {item.status}
-            </span>
-          </div>
-        ))}
+      {/* HEADER */}
+      <div className="dashboard-header">
+
+        <h1>My Applications</h1>
+
+        <p>
+          Track all your job applications in one place.
+        </p>
+
       </div>
-    )}
-  </div>
- );
+
+      {/* STATS */}
+      <div className="dashboard-stats">
+
+        <div className="stat-box">
+
+          <FaBriefcase className="blue" />
+
+          <div>
+            <h2>12</h2>
+            <p>Total Applied</p>
+          </div>
+
+        </div>
+
+        <div className="stat-box">
+
+          <FaCheckCircle className="green" />
+
+          <div>
+            <h2>4</h2>
+            <p>Accepted</p>
+          </div>
+
+        </div>
+
+        <div className="stat-box">
+
+          <FaClock className="orange" />
+
+          <div>
+            <h2>5</h2>
+            <p>Pending</p>
+          </div>
+
+        </div>
+
+        <div className="stat-box">
+
+          <FaTimesCircle className="red" />
+
+          <div>
+            <h2>3</h2>
+            <p>Rejected</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* APPLICATIONS */}
+      <div className="applications-section">
+
+        {applications.map((app) => (
+
+          <div className="application-card" key={app.id}>
+
+            <div className="application-left">
+
+              <h2>{app.title}</h2>
+
+              <p>{app.company}</p>
+
+            </div>
+
+            <div className="application-right">
+
+              <span className={`status ${app.status.toLowerCase()}`}>
+
+                {app.status}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        ))}
+
+      </div>
+
+    </div>
+  );
 }
