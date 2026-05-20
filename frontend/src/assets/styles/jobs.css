@@ -30,7 +30,7 @@
 }
 
 .jobs-header p {
-    color: rgba(255,255,255,0.85);
+    color: rgba(255, 255, 255, 0.784);
     font-size: 18px;
 }
 
@@ -87,7 +87,7 @@
 /* CARD */
 
 .job-card {
-    background: white;
+    background: rgba(243, 242, 245, 0.788);
 
     border-radius: 24px;
 
@@ -262,7 +262,7 @@
 
     border-radius: 14px;
 
-    background: #f3f4f6;
+    background: #f3f4f687;
 
     color: #111827;
 
@@ -275,7 +275,7 @@
 }
 
 .details-btn:hover {
-    background: #e5e7eb;
+    background: #e5e7ebda;
 }
 
 /* RESPONSIVE */
@@ -294,3 +294,62 @@
         flex-direction: column;
     }
 }
+
+/* CATEGORY FILTER */
+
+.category-filter {
+
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+
+    margin-bottom: 40px;
+}
+
+/* BUTTON */
+
+.category-btn {
+
+    border: none;
+
+    padding: 12px 22px;
+
+    border-radius: 50px;
+
+    background: rgba(255, 255, 255, 0.982);
+
+    color: #111827;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+    box-shadow:
+      0 4px 15px rgba(0,0,0,0.1);
+}
+
+.category-btn:hover {
+
+    transform: translateY(-3px);
+}
+
+/* ACTIVE */
+
+.active-category {
+
+    background:
+      linear-gradient(
+        to right,
+        #4f46e5,
+        #9333ea
+      );
+
+    color: rgb(255, 255, 255);
+}
+

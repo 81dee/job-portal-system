@@ -1,26 +1,66 @@
 import jwt from "jsonwebtoken";
+
 import User from "../models/user.js";
 
-export const protect = (req, res, next) => {
+
+// ================= PROTECT =================
+
+export const protect = async (req, res, next) => {
+
   try {
+
     const authHeader = req.headers.authorization;
 
-    // check token exists
+    // CHECK TOKEN
     if (!authHeader) {
-      return res.status(401).json({ message: "No token provided" });
+
+      return res.status(401).json({
+
+        success: false,
+
+        message: "No token provided"
+      });
     }
 
-    // format: Bearer TOKEN
+    // GET TOKEN
     const token = authHeader.split(" ")[1];
 
-    // verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // VERIFY TOKEN
+    const decoded = jwt.verify(
 
-    req.user = decoded; // attach user id + role
+      token,
 
-    next(); // go to next route
+      process.env.JWT_SECRET
+    );
+
+    // FETCH LATEST USER FROM DATABASE
+    const user = await User.findById(decoded.id).select("-password");
+
+    // CHECK USER
+    if (!user) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "User not found"
+      });
+    }
+
+    // ATTACH USER
+    req.user = user;
+
+    next();
 
   } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
+
+    console.log(err);
+
+    return res.status(401).json({
+
+      success: false,
+
+      message: "Invalid token"
+    });
   }
 };

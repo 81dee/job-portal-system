@@ -1,40 +1,195 @@
 import { useState } from "react";
+
+import { Link, useNavigate } from "react-router-dom";
+
 import API from "../services/api";
-import Loader from "../components/Loader";
+
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaBuilding
+} from "react-icons/fa";
+
+import "../assets/styles/login.css";
 
 export default function Register() {
-  const [form, setForm] = useState({});
 
-  const register = async () => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+
+    name: "",
+    email: "",
+    password: "",
+    role: "jobseeker",
+    companyName: ""
+
+  });
+
+  const handleChange = (e) => {
+
+    setFormData({
+
+      ...formData,
+
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
     try {
-      await API.post("/auth/register", form);
-      alert("Registered");
-    } catch (err) {
-  console.log(err.response?.data);
-  alert(err.response?.data?.error || "Error");
+
+      await API.post(
+
+        "/auth/register",
+
+        formData
+      );
+
+      alert("Registration Successful");
+
+      navigate("/login");
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Registration Failed");
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
 
-      <input placeholder="Name"
-        onChange={(e)=>setForm({...form,name:e.target.value})} />
+    <div className="login-page">
 
-      <input placeholder="Email"
-        onChange={(e)=>setForm({...form,email:e.target.value})} />
+      <div className="login-card">
 
-      <input placeholder="Password"
-        onChange={(e)=>setForm({...form,password:e.target.value})} />
+        <h1>Create Account</h1>
 
-      <select onChange={(e)=>setForm({...form,role:e.target.value})}>
-        <option value="">Select Role</option>
-        <option value="recruiter">Recruiter</option>
-        <option value="jobseeker">Jobseeker</option>
-      </select>
+        <p className="login-subtitle">
 
-      <button onClick={register}>Register</button>
+          Start your journey with JobPortal.
+
+        </p>
+
+        <form onSubmit={handleSubmit}>
+
+          {/* NAME */}
+          <div className="input-box">
+
+            <FaUser className="input-icon" />
+
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+
+          </div>
+
+          {/* EMAIL */}
+          <div className="input-box">
+
+            <FaEnvelope className="input-icon" />
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+
+          </div>
+
+          {/* PASSWORD */}
+          <div className="input-box">
+
+            <FaLock className="input-icon" />
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+
+          </div>
+
+          {/* ROLE */}
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="role-select"
+          >
+
+            <option value="jobseeker">
+
+              Job Seeker
+
+            </option>
+
+            <option value="recruiter">
+
+              Recruiter
+
+            </option>
+
+          </select>
+
+          {/* COMPANY */}
+          {formData.role === "recruiter" && (
+
+            <div className="input-box">
+
+              <FaBuilding className="input-icon" />
+
+              <input
+                type="text"
+                name="companyName"
+                placeholder="Company Name"
+                value={formData.companyName}
+                onChange={handleChange}
+                required
+              />
+
+            </div>
+
+          )}
+
+          <button type="submit">
+
+            Register
+
+          </button>
+
+        </form>
+
+        <div className="login-footer">
+
+          <p>Already have an account?</p>
+
+          <Link to="/login">
+
+            Login
+
+          </Link>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

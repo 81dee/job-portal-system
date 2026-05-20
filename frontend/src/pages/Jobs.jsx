@@ -21,13 +21,20 @@ export default function Jobs() {
 
   const [search, setSearch] = useState("");
 
+  const [category, setCategory] = useState("All");
+
+  // FETCH JOBS
   const fetchJobs = async () => {
 
     try {
 
       const res = await API.get("/job");
 
-      setJobs(Array.isArray(res.data) ? res.data : []);
+      setJobs(
+        Array.isArray(res.data)
+          ? res.data
+          : []
+      );
 
     } catch (err) {
 
@@ -40,14 +47,19 @@ export default function Jobs() {
   };
 
   useEffect(() => {
+
     fetchJobs();
+
   }, []);
 
+  // APPLY JOB
   const applyJob = async (jobId) => {
 
     try {
 
-      await API.post(`/application/apply/${jobId}`);
+      await API.post(
+        `/application/apply/${jobId}`
+      );
 
       alert("Applied Successfully");
 
@@ -61,9 +73,35 @@ export default function Jobs() {
 
   if (loading) return <Loader />;
 
-  const filteredJobs = jobs.filter((job) =>
-    job.title?.toLowerCase().includes(search.toLowerCase())
-  );
+  // CATEGORIES
+  const categories = [
+
+    "All",
+    "Technology",
+    "Finance",
+    "Healthcare",
+    "Marketing",
+    "Education",
+    "Design",
+    "Cyber Security"
+  ];
+
+  // FILTER
+  const filteredJobs = jobs.filter((job) => {
+
+    const matchesSearch =
+
+      job.title
+        ?.toLowerCase()
+        .includes(search.toLowerCase());
+
+    const matchesCategory =
+
+      category === "All" ||
+      job.category === category;
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
 
@@ -91,8 +129,38 @@ export default function Jobs() {
           type="text"
           placeholder="Search jobs..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
         />
+
+      </div>
+
+      {/* CATEGORY FILTER */}
+      <div className="category-filter">
+
+        {categories.map((cat) => (
+
+          <button
+
+            key={cat}
+
+            className={
+              category === cat
+                ? "category-btn active-category"
+                : "category-btn"
+            }
+
+            onClick={() =>
+              setCategory(cat)
+            }
+          >
+
+            {cat}
+
+          </button>
+
+        ))}
 
       </div>
 
@@ -101,7 +169,10 @@ export default function Jobs() {
 
         {filteredJobs.map((job) => (
 
-          <div className="job-card" key={job._id}>
+          <div
+            className="job-card"
+            key={job._id}
+          > 
 
             {/* TOP */}
             <div className="job-top">
@@ -113,13 +184,19 @@ export default function Jobs() {
                 </h2>
 
                 <p className="company-name">
-                  {job.company?.companyName || "Tech Company"}
+
+                  {job.companyName ||
+                    "Tech Company"}
+
                 </p>
 
               </div>
 
               <span className="job-badge">
-                {job.category || "Technology"}
+
+                {job.category ||
+                  "Technology"}
+
               </span>
 
             </div>
@@ -127,33 +204,55 @@ export default function Jobs() {
             {/* DESCRIPTION */}
             <p className="job-description">
 
-              {job.description?.slice(0, 120) || "Great opportunity"}...
+              {job.description
+                ?.slice(0, 120) ||
+                "Great opportunity"}...
 
             </p>
 
             {/* INFO */}
             <div className="job-info">
 
+              {/* LOCATION */}
               <div>
+
                 <FaMapMarkerAlt />
+
                 <span>
-                  {job.location?.city || "Remote"}
+
+                  {job.location ||
+                    "Remote"}
+
                 </span>
+
               </div>
 
+              {/* SALARY */}
               <div>
+
                 <FaMoneyBillWave />
+
                 <span>
-                  ₹{job.salaryPackage?.min || "5L"} -
-                  ₹{job.salaryPackage?.max || "12L"}
+
+                  ₹{job.salary ||
+                    "Not Disclosed"}
+
                 </span>
+
               </div>
 
+              {/* MODE */}
               <div>
+
                 <FaBriefcase />
+
                 <span>
-                  {job.workMode || "Full Time"}
+
+                  {job.workMode ||
+                    "Full Time"}
+
                 </span>
+
               </div>
 
             </div>
@@ -163,13 +262,21 @@ export default function Jobs() {
 
               <button
                 className="apply-btn"
-                onClick={() => applyJob(job._id)}
+                onClick={() =>
+                  applyJob(job._id)
+                }
               >
+
                 Apply Now
+
               </button>
 
-              <button className="details-btn">
+              <button
+                className="details-btn"
+              >
+
                 Details
+
               </button>
 
             </div>

@@ -7,7 +7,10 @@ import Jobs from "./pages/Jobs";
 import Dashboard from "./pages/Dashboard";
 import Recruiter from "./pages/Recruiter";
 import Admin from "./pages/Admin";
+import Register from "./pages/Register";
 import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
+import AdminRegister from "./pages/AdminRegister";
 
 import "./assets/styles/layout.css";
 
@@ -24,7 +27,9 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/recruiter" element={<Recruiter />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/register" element={<Login />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/admin-register" element={<AdminRegister />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
           </Routes>
         </main>

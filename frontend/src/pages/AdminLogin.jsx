@@ -1,20 +1,22 @@
 import { useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import {
   FaEnvelope,
-  FaLock
+  FaLock,
+  FaUserShield
 } from "react-icons/fa";
 
 import API from "../services/api";
 
 import "../assets/styles/login.css";
 
-export default function Login() {
+export default function AdminLogin() {
 
   const navigate = useNavigate();
 
+  // FORM STATE
   const [formData, setFormData] = useState({
 
     email: "",
@@ -22,6 +24,7 @@ export default function Login() {
 
   });
 
+  // HANDLE INPUT CHANGE
   const handleChange = (e) => {
 
     setFormData({
@@ -32,6 +35,7 @@ export default function Login() {
     });
   };
 
+  // HANDLE LOGIN
   const handleSubmit = async (e) => {
 
     e.preventDefault();
@@ -45,6 +49,27 @@ export default function Login() {
         formData
       );
 
+      // CHECK SUCCESS
+      if (!res.data.success) {
+
+        alert(
+          res.data.message
+        );
+
+        return;
+      }
+
+      // CHECK ADMIN
+      if (
+        res.data.user.role !== "admin"
+      ) {
+
+        alert("Not an admin");
+
+        return;
+      }
+
+      // SAVE TOKEN
       localStorage.setItem(
 
         "token",
@@ -52,22 +77,25 @@ export default function Login() {
         res.data.token
       );
 
+      // SAVE USER
       localStorage.setItem(
 
         "user",
 
-        JSON.stringify(res.data.user)
+        JSON.stringify(
+          res.data.user
+        )
       );
 
-      alert("Login Successful");
+      alert("Admin Login Successful");
 
-      navigate("/");
+      navigate("/admin");
 
-    } catch (error) {
+    } catch (err) {
 
-      console.log(error);
+      console.log(err);
 
-      alert("Invalid Credentials");
+      alert("Login failed");
     }
   };
 
@@ -77,14 +105,27 @@ export default function Login() {
 
       <div className="login-card">
 
-        <h1>Welcome Back</h1>
+        {/* ICON */}
+        <div className="admin-icon">
+
+          <FaUserShield />
+
+        </div>
+
+        {/* TITLE */}
+        <h1>
+
+          Admin Login
+
+        </h1>
 
         <p className="login-subtitle">
 
-          Login and continue your career journey.
+          Secure admin access for recruiter approvals.
 
         </p>
 
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
 
           {/* EMAIL */}
@@ -95,7 +136,7 @@ export default function Login() {
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder="Admin Email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -119,25 +160,27 @@ export default function Login() {
 
           </div>
 
+          {/* BUTTON */}
           <button type="submit">
 
-            Login
+            Login as Admin
 
           </button>
 
         </form>
 
+        {/* FOOTER */}
         <div className="login-footer">
 
           <p>
 
-            Don’t have an account?
+            No admin account?
 
           </p>
 
-          <Link to="/register">
+          <Link to="/admin-register">
 
-            Register
+            Register Admin
 
           </Link>
 

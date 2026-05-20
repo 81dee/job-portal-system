@@ -1,22 +1,25 @@
 import { useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import {
+  FaUserShield,
   FaEnvelope,
-  FaLock
+  FaLock,
+  FaUser
 } from "react-icons/fa";
 
 import API from "../services/api";
 
 import "../assets/styles/login.css";
 
-export default function Login() {
+export default function AdminRegister() {
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
 
+    name: "",
     email: "",
     password: ""
 
@@ -38,36 +41,26 @@ export default function Login() {
 
     try {
 
-      const res = await API.post(
+      await API.post(
 
-        "/auth/login",
+        "/auth/register",
 
-        formData
+        {
+          ...formData,
+          role: "admin",
+          isApproved: true
+        }
       );
 
-      localStorage.setItem(
+      alert("Admin Registered Successfully");
 
-        "token",
-
-        res.data.token
-      );
-
-      localStorage.setItem(
-
-        "user",
-
-        JSON.stringify(res.data.user)
-      );
-
-      alert("Login Successful");
-
-      navigate("/");
+      navigate("/admin-login");
 
     } catch (error) {
 
       console.log(error);
 
-      alert("Invalid Credentials");
+      alert("Admin Registration Failed");
     }
   };
 
@@ -77,15 +70,37 @@ export default function Login() {
 
       <div className="login-card">
 
-        <h1>Welcome Back</h1>
+        <div className="admin-icon">
+
+          <FaUserShield />
+
+        </div>
+
+        <h1>Create Admin</h1>
 
         <p className="login-subtitle">
 
-          Login and continue your career journey.
+          Register secure admin account.
 
         </p>
 
         <form onSubmit={handleSubmit}>
+
+          {/* NAME */}
+          <div className="input-box">
+
+            <FaUser className="input-icon" />
+
+            <input
+              type="text"
+              name="name"
+              placeholder="Admin Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+
+          </div>
 
           {/* EMAIL */}
           <div className="input-box">
@@ -95,7 +110,7 @@ export default function Login() {
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder="Admin Email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -121,7 +136,7 @@ export default function Login() {
 
           <button type="submit">
 
-            Login
+            Register Admin
 
           </button>
 
@@ -129,15 +144,11 @@ export default function Login() {
 
         <div className="login-footer">
 
-          <p>
+          <p>Already have admin account?</p>
 
-            Don’t have an account?
+          <Link to="/admin-login">
 
-          </p>
-
-          <Link to="/register">
-
-            Register
+            Login
 
           </Link>
 

@@ -31,6 +31,15 @@ const userSchema = new mongoose.Schema({
      portfolio: String
   },
 
+  companyName: {
+   type: String
+  },
+
+  isApproved: {
+   type: Boolean,
+   default: false
+  },
+
   savedJobs: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Job"

@@ -3,44 +3,60 @@ import Company from "../models/company.js";
 
 // CREATE JOB
 export const createJob = async (req, res) => {
-  try {
-    const { title, description, company } = req.body;
 
-    const job = await Job.create({
-      title,
-      description,
-      company,
-      createdBy: req.user.id
-    });
+    try {
 
-    res.json({
-      message: "Job created",
-      job
-    });
+        console.log(req.body);
 
-  } catch (err) {
-    res.json({ error: err.message });
-  }
+        const {
+            title,
+            description,
+            category,
+            workMode,
+            companyName,
+            salary,
+            location
+        } = req.body;
 
-    const company = await Company.findOne({
-    recruiter: req.user._id
-    });
+        if(req.user.role === "recruiter" && !req.user.isApproved){
 
-   if(!company){
-   return res.status(404).json({
-      success: false,
-      message: "Company not found"
-   });
-  }
+              return res.status(403).json({
 
-  if(company.approvalStatus !== "approved"){
-   return res.status(403).json({
-      success: false,
-      message: "Company approval pending from admin"
-   });
-  }
+              success: false,
+
+              message: "Recruiter not approved by admin"
+           });
+        }
+
+        const newJob = await Job.create({
+
+            title,
+            description,
+            category,
+            workMode,
+            companyName,
+            salary,
+            location,
+
+            createdBy: req.user?._id
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Job Created Successfully",
+            newJob
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 };
-
 
 // GET ALL JOBS
 export const getJobs = async (req, res) => {

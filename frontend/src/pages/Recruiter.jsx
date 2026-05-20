@@ -24,22 +24,44 @@ export default function Recruiter() {
     category: "",
     workMode: "",
     companyName: "",
-    salary: ""
+    salary: "",
+    location: ""
 
   });
+
+  // TOKEN
+  const token = localStorage.getItem("token");
+
+  // CONFIG
+  const config = {
+
+    headers: {
+
+      Authorization: `Bearer ${token}`
+    }
+  };
 
   // FETCH JOBS
   const fetchRecruiterJobs = async () => {
 
     try {
 
-      const res = await API.get("/job/recruiter-jobs");
+      const res = await API.get(
+
+        "/job/recruiter-jobs",
+
+        config
+      );
 
       setJobs(res.data);
 
     } catch (error) {
 
       console.log(error);
+
+      alert(
+        error?.response?.data?.message
+      );
     }
   };
 
@@ -54,7 +76,9 @@ export default function Recruiter() {
   const handleChange = (e) => {
 
     setFormData({
+
       ...formData,
+
       [e.target.name]: e.target.value
     });
   };
@@ -71,12 +95,15 @@ export default function Recruiter() {
       category: job.category || "",
       workMode: job.workMode || "",
       companyName: job.companyName || "",
-      salary: job.salary || ""
+      salary: job.salary || "",
+      location: job.location || ""
 
     });
 
     window.scrollTo({
+
       top: 0,
+
       behavior: "smooth"
     });
   };
@@ -88,11 +115,24 @@ export default function Recruiter() {
 
     try {
 
+      // CHECK TOKEN
+      if (!token) {
+
+        alert("Please login first");
+
+        return;
+      }
+
+      // UPDATE
       if (editingId) {
 
         await API.put(
+
           `/job/update/${editingId}`,
-          formData
+
+          formData,
+
+          config
         );
 
         alert("Job Updated");
@@ -101,15 +141,20 @@ export default function Recruiter() {
 
       } else {
 
+        // CREATE
         await API.post(
+
           "/job/create",
-          formData
+
+          formData,
+
+          config
         );
 
-        alert("Job Created");
+        alert("Job Created Successfully");
       }
 
-      // RESET
+      // RESET FORM
       setFormData({
 
         title: "",
@@ -117,17 +162,24 @@ export default function Recruiter() {
         category: "",
         workMode: "",
         companyName: "",
-        salary: ""
+        salary: "",
+        location: ""
 
       });
 
+      // REFRESH
       fetchRecruiterJobs();
 
     } catch (error) {
 
       console.log(error);
 
-      alert("Something went wrong");
+      alert(
+
+        error?.response?.data?.message ||
+
+        "Something went wrong"
+      );
     }
   };
 
@@ -136,7 +188,12 @@ export default function Recruiter() {
 
     try {
 
-      await API.delete(`/job/delete/${id}`);
+      await API.delete(
+
+        `/job/delete/${id}`,
+
+        config
+      );
 
       alert("Job Deleted");
 
@@ -146,7 +203,12 @@ export default function Recruiter() {
 
       console.log(error);
 
-      alert("Delete failed");
+      alert(
+
+        error?.response?.data?.message ||
+
+        "Delete failed"
+      );
     }
   };
 
@@ -158,23 +220,41 @@ export default function Recruiter() {
       <div className="dashboard-top">
 
         <div className="dashboard-card">
+
           <FaBriefcase />
+
           <div>
+
             <h2>{jobs.length}</h2>
+
             <p>Total Jobs</p>
+
           </div>
+
         </div>
 
         <div className="dashboard-card">
+
           <FaPlusCircle />
+
           <div>
+
             <h2>
+
               {editingId ? "Edit" : "Create"}
+
             </h2>
+
             <p>
-              {editingId ? "Update Job" : "New Opportunity"}
+
+              {editingId
+                ? "Update Job"
+                : "New Opportunity"}
+
             </p>
+
           </div>
+
         </div>
 
       </div>
@@ -183,7 +263,11 @@ export default function Recruiter() {
       <div className="recruiter-container">
 
         <h1>
-          {editingId ? "Edit Job" : "Create New Job"}
+
+          {editingId
+            ? "Edit Job"
+            : "Create New Job"}
+
         </h1>
 
         <form onSubmit={handleSubmit}>
@@ -222,18 +306,39 @@ export default function Recruiter() {
             onChange={handleChange}
           />
 
+          <input
+            type="text"
+            name="location"
+            placeholder="Location"
+            value={formData.location}
+            onChange={handleChange}
+          />
+
           <select
             name="category"
             value={formData.category}
             onChange={handleChange}
           >
 
-            <option value="">Select Category</option>
+            <option value="">
+              Select Category
+            </option>
 
-            <option>Technology</option>
-            <option>Finance</option>
-            <option>Healthcare</option>
-            <option>Marketing</option>
+            <option>
+              Technology
+            </option>
+
+            <option>
+              Finance
+            </option>
+
+            <option>
+              Healthcare
+            </option>
+
+            <option>
+              Marketing
+            </option>
 
           </select>
 
@@ -243,17 +348,29 @@ export default function Recruiter() {
             onChange={handleChange}
           >
 
-            <option value="">Work Mode</option>
+            <option value="">
+              Work Mode
+            </option>
 
-            <option>Remote</option>
-            <option>Hybrid</option>
-            <option>Onsite</option>
+            <option>
+              Remote
+            </option>
+
+            <option>
+              Hybrid
+            </option>
+
+            <option>
+              Onsite
+            </option>
 
           </select>
 
           <button type="submit">
 
-            {editingId ? "Update Job" : "Create Job"}
+            {editingId
+              ? "Update Job"
+              : "Create Job"}
 
           </button>
 
@@ -270,12 +387,17 @@ export default function Recruiter() {
 
           {jobs.map((job) => (
 
-            <div className="recruiter-job-card" key={job._id}>
+            <div
+              className="recruiter-job-card"
+              key={job._id}
+            >
 
               <h3>{job.title}</h3>
 
               <p>
+
                 {job.description?.slice(0, 100)}...
+
               </p>
 
               <span>{job.category}</span>
@@ -285,8 +407,11 @@ export default function Recruiter() {
                 className="edit-btn"
                 onClick={() => editJob(job)}
               >
+
                 <FaEdit />
+
                 Edit
+
               </button>
 
               {/* DELETE */}
@@ -294,8 +419,11 @@ export default function Recruiter() {
                 className="delete-btn"
                 onClick={() => deleteJob(job._id)}
               >
+
                 <FaTrash />
+
                 Delete
+
               </button>
 
             </div>

@@ -1,20 +1,28 @@
 import express from "express";
-import { createJob, getRecruiterJobs, deleteJob, getJobs, updateJob } from "../controllers/job.controller.js";
-import { protect } from "..//middlewares/auth.middleware.js";
-import { authorizeRoles } from "..//middlewares/role.middleware.js";
+import { protect } from "../middlewares/auth.middleware.js";
+import {
+  createJob,
+  getJobs,
+  deleteJob,
+  updateJob,
+  getRecruiterJobs
+} from "../controllers/job.controller.js";
 
 const router = express.Router();
 
-// only recrutier can create job
-router.post("/create", protect, authorizeRoles("recruiter"), createJob);
+// CREATE JOB
+router.post("/create", protect, createJob);
 
-// anyone can viewjobs
+// GET ALL JOBS
 router.get("/", getJobs);
 
-router.put("/update/:id", updateJob);
-
+// GET RECRUITER JOBS
 router.get("/recruiter-jobs", getRecruiterJobs);
 
+// UPDATE JOB
+router.put("/update/:id", updateJob);
+
+// DELETE JOB
 router.delete("/delete/:id", deleteJob);
 
 export default router;
