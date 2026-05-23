@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const API = axios.create({
-    baseURL: "http://localhost:3000/api",
+    baseURL: "https://job-portal-backend-g2rd.onrender.com",
 });
 
 // attach token in every request
