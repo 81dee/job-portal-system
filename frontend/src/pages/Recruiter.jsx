@@ -30,6 +30,10 @@ export default function Recruiter() {
     workMode: "Remote",
     companyName: "",
     salary: "",
+    industry: "",
+    education: "",
+    skillsRequired: "",
+    experienceRequired: "",
     location: ""
 
   });
@@ -135,6 +139,19 @@ export default function Recruiter() {
       salary:
         job.salary || "",
 
+      industry:
+        job.industry || "",
+
+      education:
+        job.education || "",
+
+      skillsRequired:
+        job.skillsRequired?.join(", ")
+        || "",
+
+      experienceRequired:
+        job.experienceRequired || "",
+
       location:
         job.location || ""
     });
@@ -217,6 +234,10 @@ export default function Recruiter() {
         workMode: "Remote",
         companyName: "",
         salary: "",
+        industry: "",
+        education: "",
+        skillsRequired: "", 
+        experienceRequired: "",
         location: ""
 
       });
@@ -402,6 +423,42 @@ export default function Recruiter() {
             onChange={handleChange}
             required
           />
+
+          {/* INDUSTRY */}
+          <input
+            type="text"
+            name="industry"
+            placeholder="Industry (Software, Banking)"
+            value={formData.industry}
+            onChange={handleChange}
+          />
+
+          {/* EDUCATION */}
+          <input
+            type="text"
+            name="education"
+            placeholder="Education (BCA, MCA, MBA)"
+            value={formData.education}
+            onChange={handleChange}
+          />
+
+          {/* SKILLS */}
+          <input
+            type="text"
+            name="skillsRequired"
+            placeholder="Skills (React, Node, AI)"
+            value={formData.skillsRequired}
+            onChange={handleChange}
+          />
+
+         {/* EXPERIENCE */}
+         <input
+           type="text"
+           name="experienceRequired"
+           placeholder="Experience Required"
+           value={formData.experienceRequired}
+           onChange={handleChange}
+         />
 
           {/* LOCATION */}
           <input

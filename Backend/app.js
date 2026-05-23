@@ -10,6 +10,7 @@ import applicationRoutes from "./routes/application.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import companyRoutes from "./routes/company.routes.js";
 import { protect } from "./middlewares/auth.middleware.js";
+import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import path from "path";
 
@@ -38,6 +39,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/application", applicationRoutes);
 app.use("/api/company", companyRoutes);
+app.use("/api/notification", notificationRoutes);
 
 // test route
 app.get("/", (req, res) => {

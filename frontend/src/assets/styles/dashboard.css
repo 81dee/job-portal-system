@@ -1,17 +1,44 @@
 .dashboard-page{
 
-    padding: 40px;
-
     min-height: 100vh;
+
+    padding: 40px;
 
     background:
       linear-gradient(
         135deg,
-        #667eea,
-        #764ba2
+        #667eeae4,
+        #764ba2c6
       );
 
     color: white;
+}
+
+/* PROFILE */
+
+.profile-card{
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    background:
+      rgba(255, 255, 255, 0.248);
+
+    backdrop-filter: blur(18px);
+
+    padding: 25px;
+
+    border-radius: 24px;
+
+    margin-bottom: 35px;
+}
+
+.profile-icon{
+
+    font-size: 55px;
 }
 
 /* STATS */
@@ -28,7 +55,7 @@
     margin-bottom: 40px;
 }
 
-.dashboard-stat-card{
+.stat-card{
 
     background:
       rgba(255,255,255,0.12);
@@ -43,39 +70,34 @@
 
     align-items: center;
 
-    gap: 20px;
+    gap: 18px;
 
-    box-shadow:
-      0 10px 30px rgba(0,0,0,0.2);
-}
-
-.stat-icon{
-
-    font-size: 40px;
+    font-size: 18px;
 }
 
 .accepted{
 
-    color: #22c55e;
+    border-left:
+      5px solid #22c55e;
 }
 
 .rejected{
 
-    color: #ef4444;
+    border-left:
+      5px solid #ef4444;
 }
 
 .pending{
 
-    color: #facc15;
+    border-left:
+      5px solid #facc15;
 }
 
 /* APPLICATIONS */
 
-.dashboard-applications h1{
+.applications-section h1{
 
-    margin-bottom: 25px;
-
-    font-size: 36px;
+    margin-bottom: 30px;
 }
 
 .applications-grid{
@@ -83,7 +105,7 @@
     display: grid;
 
     grid-template-columns:
-      repeat(auto-fit,minmax(300px,1fr));
+      repeat(auto-fit,minmax(320px,1fr));
 
     gap: 25px;
 }
@@ -98,9 +120,6 @@
     border-radius: 24px;
 
     padding: 25px;
-
-    box-shadow:
-      0 10px 30px rgba(0,0,0,0.2);
 }
 
 .application-card h2{
@@ -108,24 +127,17 @@
     margin-bottom: 10px;
 }
 
-.application-card p{
-
-    margin-bottom: 8px;
-}
-
 .status{
 
     display: inline-block;
 
-    padding: 8px 16px;
+    margin: 15px 0;
+
+    padding: 8px 18px;
 
     border-radius: 30px;
 
-    font-size: 14px;
-
     font-weight: 700;
-
-    margin: 15px 0;
 }
 
 .status.pending{
@@ -143,4 +155,60 @@
 .status.rejected{
 
     background: #ef4444;
+}
+
+.message-box{
+
+    display: flex;
+
+    gap: 12px;
+
+    background:
+      rgba(255,255,255,0.1);
+
+    padding: 15px;
+
+    border-radius: 14px;
+
+    margin: 15px 0;
+}
+
+.interview-box{
+
+    display: flex;
+
+    gap: 14px;
+
+    align-items: center;
+
+    margin-top: 18px;
+}
+
+.meeting-link{
+
+    display: inline-block;
+
+    margin-top: 18px;
+
+    padding: 12px 18px;
+
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    color: white;
+
+    background:
+      linear-gradient(
+        to right,
+        #4f46e5,
+        #9333ea
+      );
+}
+
+.empty-state{
+
+    text-align: center;
+
+    padding: 60px;
 }

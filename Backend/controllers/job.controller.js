@@ -14,7 +14,11 @@ export const createJob = async (req, res) => {
             workMode,
             companyName,
             salary,
-            location
+            location,
+            industry,
+            education,
+            skillsRequired,
+            experienceRequired
         } = req.body;
 
         const recruiter = await User.findById(req.user.id);
@@ -44,6 +48,12 @@ export const createJob = async (req, res) => {
             companyName,
             salary,
             location,
+            industry,
+            education,
+            skillsRequired:
+            skillsRequired.split(","),
+
+            experienceRequired,
 
             createdBy: req.user._id
         });
@@ -76,12 +86,12 @@ export const getJobs = async (req, res) => {
         "name email companyName"
     );
 
-    res.json(jobs);
+        res.json(jobs);
 
-  } catch (err) {
-    res.json({ error: err.message });
-  }
-};
+      } catch (err) {
+        res.json({ error: err.message });
+     }
+   };
 
 export const getRecruiterJobs = async (req, res) => {
 

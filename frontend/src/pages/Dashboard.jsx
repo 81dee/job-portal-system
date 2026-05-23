@@ -3,11 +3,18 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 
 import {
+
   FaBriefcase,
   FaCheckCircle,
   FaTimesCircle,
-  FaClock
+  FaClock,
+  FaBell,
+  FaCalendarAlt,
+  FaUser
+
 } from "react-icons/fa";
+
+import Notifications from "../components/Notifications";
 
 import "../assets/styles/dashboard.css";
 
@@ -24,12 +31,17 @@ export default function Dashboard() {
 
   });
 
+  const token = localStorage.getItem("token");
+
+  const user = JSON.parse(
+
+    localStorage.getItem("user")
+  );
+
   // FETCH APPLICATIONS
   const fetchApplications = async () => {
 
     try {
-
-      const token = localStorage.getItem("token");
 
       const res = await API.get(
 
@@ -43,43 +55,42 @@ export default function Dashboard() {
         }
       );
 
-      setApplications(res.data);
+      const data = Array.isArray(res.data)
 
-      // STATS
-      const total = res.data.length;
+        ? res.data
 
-      const accepted = res.data.filter(
+        : [];
 
-        app =>
+      setApplications(data);
 
-          app.status === "accepted"
-      ).length;
+    } catch (error) {
 
-      const rejected = res.data.filter(
+      console.log(error);
+    }
+  };
 
-        app =>
+  // FETCH STATS
+  const fetchStats = async () => {
 
-          app.status === "rejected"
-      ).length;
+    try {
 
-      const pending = res.data.filter(
+      const res = await API.get(
 
-        app =>
+        "/application/jobseeker-stats",
 
-          app.status === "pending"
-      ).length;
+        {
+          headers: {
 
-      setStats({
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
-        total,
-        accepted,
-        rejected,
-        pending
-      });
+      setStats(res.data);
 
-    } catch (err) {
+    } catch (error) {
 
-      console.log(err);
+      console.log(error);
     }
   };
 
@@ -87,19 +98,48 @@ export default function Dashboard() {
 
     fetchApplications();
 
+    fetchStats();
+
   }, []);
 
   return (
 
     <div className="dashboard-page">
 
-      {/* TOP STATS */}
+      {/* PROFILE */}
+      <div className="profile-card">
+
+        <FaUser className="profile-icon" />
+
+        <div>
+
+          <h2>
+
+            {user?.name}
+
+          </h2>
+
+          <p>
+
+            {user?.email}
+
+          </p>
+
+          <span>
+
+            Jobseeker
+          </span>
+
+        </div>
+
+      </div>
+
+      {/* STATS */}
       <div className="dashboard-stats">
 
-        {/* TOTAL */}
-        <div className="dashboard-stat-card">
+        <div className="stat-card">
 
-          <FaBriefcase className="stat-icon" />
+          <FaBriefcase />
 
           <div>
 
@@ -111,10 +151,9 @@ export default function Dashboard() {
 
         </div>
 
-        {/* ACCEPTED */}
-        <div className="dashboard-stat-card">
+        <div className="stat-card accepted">
 
-          <FaCheckCircle className="stat-icon accepted" />
+          <FaCheckCircle />
 
           <div>
 
@@ -126,10 +165,9 @@ export default function Dashboard() {
 
         </div>
 
-        {/* REJECTED */}
-        <div className="dashboard-stat-card">
+        <div className="stat-card rejected">
 
-          <FaTimesCircle className="stat-icon rejected" />
+          <FaTimesCircle />
 
           <div>
 
@@ -141,10 +179,9 @@ export default function Dashboard() {
 
         </div>
 
-        {/* PENDING */}
-        <div className="dashboard-stat-card">
+        <div className="stat-card pending">
 
-          <FaClock className="stat-icon pending" />
+          <FaClock />
 
           <div>
 
@@ -159,64 +196,130 @@ export default function Dashboard() {
       </div>
 
       {/* APPLICATIONS */}
-      <div className="dashboard-applications">
+      <div className="applications-section">
 
-        <h1>My Applications</h1>
+        <h1>
 
-        <div className="applications-grid">
+          My Applications
 
-          {applications.map((app) => (
+        </h1>
 
-            <div
-              className="application-card"
-              key={app._id}
-            >
+        {applications.length > 0 ? (
 
-              <h2>
+          <div className="applications-grid">
 
-                {app.job?.title}
+            {applications.map((app) => (
 
-              </h2>
+              <div
+                className="application-card"
+                key={app._id}
+              >
 
-              <p>
+                <h2>
 
-                {app.job?.companyName}
+                  {app.job?.title}
 
-              </p>
-
-              <span className={`status ${app.status}`}>
-
-                {app.status}
-
-              </span>
-
-              <div className="application-info">
+                </h2>
 
                 <p>
 
-                  <strong>Location:</strong>
-
-                  {app.job?.location}
+                  {app.job?.companyName}
 
                 </p>
 
-                <p>
+                {/* STATUS */}
+                <span className={`status ${app.status}`}>
 
-                  <strong>Salary:</strong>
+                  {app.status}
 
-                  ₹{app.job?.salary}
+                </span>
 
-                </p>
+                {/* MESSAGE */}
+                {app.message && (
+
+                  <div className="message-box">
+
+                    <FaBell />
+
+                    <p>
+
+                      {app.message}
+
+                    </p>
+
+                  </div>
+                )}
+
+                {/* INTERVIEW */}
+                {app.interviewDate && (
+
+                  <div className="interview-box">
+
+                    <FaCalendarAlt />
+
+                    <div>
+
+                      <p>
+
+                        Interview Scheduled
+
+                      </p>
+
+                      <span>
+
+                        {new Date(
+
+                          app.interviewDate
+
+                        ).toLocaleString()}
+
+                      </span>
+
+                    </div>
+
+                  </div>
+                )}
+
+                {/* INTERVIEW LINK */}
+                {app.interviewLink && (
+
+                  <a
+
+                    href={app.interviewLink}
+
+                    target="_blank"
+
+                    rel="noreferrer"
+
+                    className="meeting-link"
+                  >
+
+                    Join Interview
+
+                  </a>
+                )}
 
               </div>
+            ))}
 
-            </div>
+          </div>
 
-          ))}
+        ) : (
 
-        </div>
+          <div className="empty-state">
+
+            <h2>
+
+              No Applications Yet
+
+            </h2>
+
+          </div>
+        )}
 
       </div>
+       
+       <Notifications />
 
     </div>
   );

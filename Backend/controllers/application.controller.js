@@ -1,5 +1,6 @@
 import Application from "../models/application.js";
 import Job from "../models/job.js";
+import Notification from "../models/notification.js";
 
 // APPLY JOB
 export const applyJob = async (req, res) => {
@@ -167,6 +168,13 @@ export const updateApplicationStatus = async (req, res) => {
     application.interviewDate = interviewDate;
 
     application.interviewLink = interviewLink;
+
+    await Notification.create({
+
+     user: application.user,
+
+     text: `Your application for ${application.job} was ${status}`
+   });
 
     await application.save();
 

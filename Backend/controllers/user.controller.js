@@ -69,3 +69,73 @@ export const deleteResume = async (req, res) => {
     res.json({ error: err.message });
   }
 };
+
+// UPDATE PROFILE
+export const updateProfile = async (
+
+  req,
+
+  res
+
+) => {
+
+  try {
+
+    const {
+
+      skills,
+
+      qualification,
+
+      experience,
+
+      bio
+
+    } = req.body;
+
+    const user = await User.findById(
+
+      req.user.id
+    );
+
+    if (!user) {
+
+      return res.status(404).json({
+
+        message: "User not found"
+      });
+    }
+
+    user.skills = skills;
+
+    user.qualification = qualification;
+
+    user.experience = experience;
+
+    user.bio = bio;
+
+    // PROFILE PHOTO
+    if (req.file) {
+
+      user.profilePhoto = req.file.filename;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+
+      success: true,
+
+      message: "Profile updated",
+
+      user
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      error: error.message
+    });
+  }
+};

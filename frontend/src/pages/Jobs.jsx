@@ -35,8 +35,11 @@ export default function Jobs() {
       const res = await API.get("/job");
 
       setJobs(
+
         Array.isArray(res.data)
+
           ? res.data
+
           : []
       );
 
@@ -68,24 +71,92 @@ export default function Jobs() {
     "Marketing",
     "Education",
     "Design",
-    "Cyber Security"
+    "Cyber Security",
+    "AI/ML",
+    "Data Science",
+    "Law"
   ];
 
   // FILTER
   const filteredJobs = jobs.filter((job) => {
 
+    const searchText =
+
+      search.toLowerCase();
+
     const matchesSearch =
 
       job.title
         ?.toLowerCase()
-        .includes(search.toLowerCase());
+        .includes(searchText)
+
+      ||
+
+      job.companyName
+        ?.toLowerCase()
+        .includes(searchText)
+
+      ||
+
+      job.category
+        ?.toLowerCase()
+        .includes(searchText)
+
+      ||
+
+      job.industry
+        ?.toLowerCase()
+        .includes(searchText)
+
+      ||
+
+      job.education
+        ?.toLowerCase()
+        .includes(searchText)
+
+      ||
+
+      job.skillsRequired
+        ?.join(" ")
+        .toLowerCase()
+        .includes(searchText);
 
     const matchesCategory =
 
-      category === "All" ||
+      category === "All"
+
+      ||
+
       job.category === category;
 
-    return matchesSearch && matchesCategory;
+    return (
+
+      matchesSearch &&
+
+      matchesCategory
+    );
+  });
+
+  // SORT
+  filteredJobs.sort((a, b) => {
+
+    const searchText =
+
+      search.toLowerCase();
+
+    const aExact =
+
+      a.companyName
+        ?.toLowerCase()
+        .includes(searchText);
+
+    const bExact =
+
+      b.companyName
+        ?.toLowerCase()
+        .includes(searchText);
+
+    return bExact - aExact;
   });
 
   return (
@@ -96,11 +167,15 @@ export default function Jobs() {
       <div className="jobs-header">
 
         <h1>
+
           Available Jobs
+
         </h1>
 
         <p>
+
           Find opportunities from top companies
+
         </p>
 
       </div>
@@ -149,7 +224,7 @@ export default function Jobs() {
 
       </div>
 
-      {/* JOBS */}
+      {/* JOBS GRID */}
       <div className="jobs-grid">
 
         {filteredJobs.map((job) => (
@@ -157,7 +232,7 @@ export default function Jobs() {
           <div
             className="job-card"
             key={job._id}
-          > 
+          >
 
             {/* TOP */}
             <div className="job-top">
@@ -165,7 +240,9 @@ export default function Jobs() {
               <div>
 
                 <h2>
+
                   {job.title}
+
                 </h2>
 
                 <p className="company-name">
@@ -190,12 +267,13 @@ export default function Jobs() {
             <p className="job-description">
 
               {job.description
-                ?.slice(0, 120) ||
+                ?.slice(0, 140) ||
+
                 "Great opportunity"}...
 
             </p>
 
-            {/* INFO */}
+            {/* BASIC INFO */}
             <div className="job-info">
 
               {/* LOCATION */}
@@ -226,7 +304,7 @@ export default function Jobs() {
 
               </div>
 
-              {/* MODE */}
+              {/* WORK MODE */}
               <div>
 
                 <FaBriefcase />
@@ -242,19 +320,111 @@ export default function Jobs() {
 
             </div>
 
-            {/* BUTTONS */}
+            {/* EXTRA INFO */}
+            <div className="extra-job-info">
+
+              {/* INDUSTRY */}
+              <div className="info-item">
+
+                <span className="label">
+
+                  Industry
+
+                </span>
+
+                <span className="value">
+
+                  {job.industry ||
+                    "General"}
+
+                </span>
+
+              </div>
+
+              {/* EDUCATION */}
+              <div className="info-item">
+
+                <span className="label">
+
+                  Education
+
+                </span>
+
+                <span className="value">
+
+                  {job.education ||
+                    "Any Graduate"}
+
+                </span>
+
+              </div>
+
+              {/* EXPERIENCE */}
+              <div className="info-item">
+
+                <span className="label">
+
+                  Experience
+
+                </span>
+
+                <span className="value">
+
+                  {job.experienceRequired ||
+                    "Fresher"}
+
+                </span>
+
+              </div>
+
+              {/* SKILLS */}
+              <div className="info-item">
+
+                <span className="label">
+
+                  Skills
+
+                </span>
+
+                <span className="value">
+
+                  {job.skillsRequired?.join(", ")
+                    ||
+                    "Communication"}
+
+                </span>
+
+              </div>
+
+            </div>
+
+            {/* ACTION BUTTONS */}
             <div className="job-actions">
 
-              <button
-                className="apply-btn"
-                onClick={() =>
-                  setSelectedJob(job)
-                }
-              >
+              {job.status === "Open" ? (
 
-                Apply Now
+                <button
+                  className="apply-btn"
+                  onClick={() =>
+                    setSelectedJob(job)
+                  }
+                >
 
-              </button>
+                  Apply Now
+
+                </button>
+
+              ) : (
+
+                <button
+                  className="closed-btn"
+                  disabled
+                >
+
+                  Closed
+
+                </button>
+              )}
 
               <button
                 className="details-btn"
@@ -267,21 +437,22 @@ export default function Jobs() {
             </div>
 
           </div>
-
         ))}
 
       </div>
-       {selectedJob && (
 
-         <ApplyModal
+      {/* APPLY MODAL */}
+      {selectedJob && (
 
-           job={selectedJob}
+        <ApplyModal
 
-           closeModal={() =>
-             setSelectedJob(null)
-           }
-         />
-       )}
+          job={selectedJob}
+
+          closeModal={() =>
+            setSelectedJob(null)
+          }
+        />
+      )}
 
     </div>
   );
