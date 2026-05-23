@@ -1,0 +1,186 @@
+.recruiter-applications-page{
+
+    min-height: 100vh;
+
+    padding: 40px;
+
+    background:
+      linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+      );
+
+    color: white;
+}
+
+.recruiter-applications-page h1{
+
+    margin-bottom: 35px;
+
+    font-size: 42px;
+}
+
+.applications-container{
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(auto-fit,minmax(350px,1fr));
+
+    gap: 25px;
+}
+
+.applicant-card{
+
+    background:
+      rgba(255,255,255,0.12);
+
+    backdrop-filter: blur(20px);
+
+    border-radius: 24px;
+
+    padding: 25px;
+
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.2);
+}
+
+.applicant-top{
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.job-title{
+
+    margin-bottom: 20px;
+
+    font-size: 15px;
+}
+
+.applicant-info{
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.applicant-info p{
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.applicant-details{
+
+    margin-bottom: 25px;
+}
+
+.applicant-details p{
+
+    margin-bottom: 12px;
+
+    line-height: 1.5;
+}
+
+.status{
+
+    padding: 8px 16px;
+
+    border-radius: 30px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.status.pending{
+
+    background: #facc15;
+
+    color: black;
+}
+
+.status.accepted{
+
+    background: #22c55e;
+}
+
+.status.rejected{
+
+    background: #ef4444;
+}
+
+.resume-btn{
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px 18px;
+
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    color: white;
+
+    background:
+      linear-gradient(
+        to right,
+        #4f46e5,
+        #9333ea
+      );
+
+    margin-bottom: 20px;
+}
+
+.applicant-actions{
+
+    display: flex;
+
+    gap: 15px;
+}
+
+.accept-btn,
+.reject-btn{
+
+    flex: 1;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    color: white;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.accept-btn{
+
+    background: #22c55e;
+}
+
+.reject-btn{
+
+    background: #ef4444;
+}

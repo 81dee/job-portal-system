@@ -6,8 +6,11 @@ import {
   FaTrash,
   FaBriefcase,
   FaPlusCircle,
-  FaEdit
+  FaEdit,
+  FaUsers
 } from "react-icons/fa";
+
+import { Link } from "react-router-dom";
 
 import "../assets/styles/recruiter.css";
 
@@ -17,12 +20,14 @@ export default function Recruiter() {
 
   const [editingId, setEditingId] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
 
     title: "",
     description: "",
-    category: "",
-    workMode: "",
+    category: "Technology",
+    workMode: "Remote",
     companyName: "",
     salary: "",
     location: ""
@@ -31,6 +36,12 @@ export default function Recruiter() {
 
   // TOKEN
   const token = localStorage.getItem("token");
+
+  // USER
+  const user = JSON.parse(
+
+    localStorage.getItem("user")
+  );
 
   // CONFIG
   const config = {
@@ -53,14 +64,26 @@ export default function Recruiter() {
         config
       );
 
-      setJobs(res.data);
+      console.log("RECRUITER JOBS:", res.data);
+
+      setJobs(
+
+        Array.isArray(res.data)
+
+          ? res.data
+
+          : []
+      );
 
     } catch (error) {
 
       console.log(error);
 
       alert(
-        error?.response?.data?.message
+
+        error?.response?.data?.message ||
+
+        "Failed to load jobs"
       );
     }
   };
@@ -68,7 +91,10 @@ export default function Recruiter() {
   // USE EFFECT
   useEffect(() => {
 
-    fetchRecruiterJobs();
+    if (token) {
+
+      fetchRecruiterJobs();
+    }
 
   }, []);
 
@@ -79,7 +105,9 @@ export default function Recruiter() {
 
       ...formData,
 
-      [e.target.name]: e.target.value
+      [e.target.name]:
+
+        e.target.value
     });
   };
 
@@ -91,13 +119,24 @@ export default function Recruiter() {
     setFormData({
 
       title: job.title || "",
-      description: job.description || "",
-      category: job.category || "",
-      workMode: job.workMode || "",
-      companyName: job.companyName || "",
-      salary: job.salary || "",
-      location: job.location || ""
 
+      description:
+        job.description || "",
+
+      category:
+        job.category || "Technology",
+
+      workMode:
+        job.workMode || "Remote",
+
+      companyName:
+        job.companyName || "",
+
+      salary:
+        job.salary || "",
+
+      location:
+        job.location || ""
     });
 
     window.scrollTo({
@@ -115,13 +154,28 @@ export default function Recruiter() {
 
     try {
 
-      // CHECK TOKEN
+      setLoading(true);
+
+      // CHECK LOGIN
       if (!token) {
 
         alert("Please login first");
 
         return;
       }
+
+      // CHECK ROLE
+      if (user?.role !== "recruiter") {
+
+        alert(
+
+          "Only recruiters can create jobs"
+        );
+
+        return;
+      }
+
+      console.log(formData);
 
       // UPDATE
       if (editingId) {
@@ -135,7 +189,7 @@ export default function Recruiter() {
           config
         );
 
-        alert("Job Updated");
+        alert("Job Updated Successfully");
 
         setEditingId(null);
 
@@ -159,8 +213,8 @@ export default function Recruiter() {
 
         title: "",
         description: "",
-        category: "",
-        workMode: "",
+        category: "Technology",
+        workMode: "Remote",
         companyName: "",
         salary: "",
         location: ""
@@ -180,11 +234,22 @@ export default function Recruiter() {
 
         "Something went wrong"
       );
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
   // DELETE
   const deleteJob = async (id) => {
+
+    const confirmDelete = window.confirm(
+
+      "Delete this job?"
+    );
+
+    if (!confirmDelete) return;
 
     try {
 
@@ -216,7 +281,7 @@ export default function Recruiter() {
 
     <div className="recruiter-page">
 
-      {/* TOP DASHBOARD */}
+      {/* DASHBOARD TOP */}
       <div className="dashboard-top">
 
         <div className="dashboard-card">
@@ -241,17 +306,42 @@ export default function Recruiter() {
 
             <h2>
 
-              {editingId ? "Edit" : "Create"}
+              {editingId
+
+                ? "Edit"
+
+                : "Create"}
 
             </h2>
 
             <p>
 
               {editingId
+
                 ? "Update Job"
+
                 : "New Opportunity"}
 
             </p>
+
+          </div>
+
+        </div>
+
+        <div className="dashboard-card">
+
+          <FaUsers />
+
+          <div>
+
+            <Link
+              to="/recruiter-applications"
+              className="applicant-link"
+            >
+
+              View Applicants
+
+            </Link>
 
           </div>
 
@@ -265,13 +355,16 @@ export default function Recruiter() {
         <h1>
 
           {editingId
+
             ? "Edit Job"
+
             : "Create New Job"}
 
         </h1>
 
         <form onSubmit={handleSubmit}>
 
+          {/* TITLE */}
           <input
             type="text"
             name="title"
@@ -281,6 +374,7 @@ export default function Recruiter() {
             required
           />
 
+          {/* DESCRIPTION */}
           <textarea
             name="description"
             placeholder="Job Description"
@@ -289,6 +383,7 @@ export default function Recruiter() {
             required
           />
 
+          {/* COMPANY */}
           <input
             type="text"
             name="companyName"
@@ -298,78 +393,92 @@ export default function Recruiter() {
             required
           />
 
+          {/* SALARY */}
           <input
             type="text"
             name="salary"
             placeholder="Salary Package"
             value={formData.salary}
             onChange={handleChange}
+            required
           />
 
+          {/* LOCATION */}
           <input
             type="text"
             name="location"
             placeholder="Location"
             value={formData.location}
             onChange={handleChange}
+            required
           />
 
+          {/* CATEGORY */}
           <select
             name="category"
             value={formData.category}
             onChange={handleChange}
+            required
           >
 
-            <option value="">
-              Select Category
-            </option>
-
-            <option>
+            <option value="Technology">
               Technology
             </option>
 
-            <option>
+            <option value="Finance">
               Finance
             </option>
 
-            <option>
+            <option value="Healthcare">
               Healthcare
             </option>
 
-            <option>
+            <option value="Marketing">
               Marketing
+            </option>
+
+            <option value="Education">
+              Education
             </option>
 
           </select>
 
+          {/* WORK MODE */}
           <select
             name="workMode"
             value={formData.workMode}
             onChange={handleChange}
+            required
           >
 
-            <option value="">
-              Work Mode
-            </option>
-
-            <option>
+            <option value="Remote">
               Remote
             </option>
 
-            <option>
+            <option value="Hybrid">
               Hybrid
             </option>
 
-            <option>
+            <option value="Onsite">
               Onsite
             </option>
 
           </select>
 
-          <button type="submit">
+          {/* BUTTON */}
+          <button
+            type="submit"
+            disabled={loading}
+          >
 
-            {editingId
+            {loading
+
+              ? "Please Wait..."
+
+              : editingId
+
               ? "Update Job"
+
               : "Create Job"}
 
           </button>
@@ -385,50 +494,109 @@ export default function Recruiter() {
 
         <div className="recruiter-jobs-grid">
 
-          {jobs.map((job) => (
+          {jobs.length > 0 ? (
 
-            <div
-              className="recruiter-job-card"
-              key={job._id}
-            >
+            jobs.map((job) => (
 
-              <h3>{job.title}</h3>
-
-              <p>
-
-                {job.description?.slice(0, 100)}...
-
-              </p>
-
-              <span>{job.category}</span>
-
-              {/* EDIT */}
-              <button
-                className="edit-btn"
-                onClick={() => editJob(job)}
+              <div
+                className="recruiter-job-card"
+                key={job._id}
               >
 
-                <FaEdit />
+                <h3>{job.title}</h3>
 
-                Edit
+                <p>
 
-              </button>
+                  {
+                    job.description?.slice(
+                      0,
+                      120
+                    )
+                  }...
 
-              {/* DELETE */}
-              <button
-                className="delete-btn"
-                onClick={() => deleteJob(job._id)}
-              >
+                </p>
 
-                <FaTrash />
+                <span>
 
-                Delete
+                  {job.category}
 
-              </button>
+                </span>
+
+                <div className="job-card-info">
+
+                  <p>
+
+                    <strong>Company:</strong>
+
+                    {job.companyName}
+
+                  </p>
+
+                  <p>
+
+                    <strong>Salary:</strong>
+
+                    {job.salary}
+
+                  </p>
+
+                  <p>
+
+                    <strong>Mode:</strong>
+
+                    {job.workMode}
+
+                  </p>
+
+                </div>
+
+                {/* ACTION BUTTONS */}
+                <div className="job-actions">
+
+                  {/* EDIT */}
+                  <button
+                    className="edit-btn"
+                    onClick={() => editJob(job)}
+                  >
+
+                    <FaEdit />
+
+                    Edit
+
+                  </button>
+
+                  {/* DELETE */}
+                  <button
+                    className="delete-btn"
+                    onClick={() =>
+                      deleteJob(job._id)
+                    }
+                  >
+
+                    <FaTrash />
+
+                    Delete
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))
+
+          ) : (
+
+            <div className="no-jobs">
+
+              <h2>
+
+                No Jobs Posted Yet
+
+              </h2>
 
             </div>
-
-          ))}
+          )}
 
         </div>
 

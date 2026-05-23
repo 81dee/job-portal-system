@@ -13,6 +13,7 @@ import {
   FaHome,
   FaBriefcase,
   FaUser,
+  FaUsers,
   FaUserTie,
   FaUserShield,
   FaUserPlus,
@@ -116,21 +117,43 @@ export default function Navbar() {
           {/* RECRUITER */}
           {user?.role === "recruiter" && (
 
-            <Link
-              className={
-                location.pathname === "/recruiter"
-                  ? "active"
-                  : ""
+           <>
+
+            {/* RECRUITER DASHBOARD */}
+              <Link
+                className={
+                  location.pathname === "/recruiter"
+                    ? "active"
+                    : ""
               }
               to="/recruiter"
-            >
+           >
 
-              <FaUserTie />
+             <FaUserTie />
 
               Recruiter
 
+           </Link>
+
+           {/* APPLICANTS */}
+           <Link
+             className={
+               location.pathname ===
+               "/recruiter-applications"
+                 ? "active"
+                 : ""
+            }
+              to="/recruiter-applications"
+           >
+
+            <FaUsers />
+
+              Applicants
+
             </Link>
-          )}
+
+          </>
+        )}
 
           {/* ADMIN */}
           {user?.role === "admin" && (

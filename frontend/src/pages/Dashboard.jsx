@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+
+import API from "../services/api";
+
 import {
   FaBriefcase,
   FaCheckCircle,
@@ -9,89 +13,145 @@ import "../assets/styles/dashboard.css";
 
 export default function Dashboard() {
 
-  const applications = [
+  const [applications, setApplications] = useState([]);
 
-    {
-      id: 1,
-      title: "Frontend Developer",
-      company: "Google",
-      status: "Pending"
-    },
+  const [stats, setStats] = useState({
 
-    {
-      id: 2,
-      title: "Backend Developer",
-      company: "Microsoft",
-      status: "Accepted"
-    },
+    total: 0,
+    accepted: 0,
+    rejected: 0,
+    pending: 0
 
-    {
-      id: 3,
-      title: "UI/UX Designer",
-      company: "Amazon",
-      status: "Rejected"
+  });
+
+  // FETCH APPLICATIONS
+  const fetchApplications = async () => {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const res = await API.get(
+
+        "/application/my",
+
+        {
+          headers: {
+
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      setApplications(res.data);
+
+      // STATS
+      const total = res.data.length;
+
+      const accepted = res.data.filter(
+
+        app =>
+
+          app.status === "accepted"
+      ).length;
+
+      const rejected = res.data.filter(
+
+        app =>
+
+          app.status === "rejected"
+      ).length;
+
+      const pending = res.data.filter(
+
+        app =>
+
+          app.status === "pending"
+      ).length;
+
+      setStats({
+
+        total,
+        accepted,
+        rejected,
+        pending
+      });
+
+    } catch (err) {
+
+      console.log(err);
     }
+  };
 
-  ];
+  useEffect(() => {
+
+    fetchApplications();
+
+  }, []);
 
   return (
 
     <div className="dashboard-page">
 
-      {/* HEADER */}
-      <div className="dashboard-header">
-
-        <h1>My Applications</h1>
-
-        <p>
-          Track all your job applications in one place.
-        </p>
-
-      </div>
-
-      {/* STATS */}
+      {/* TOP STATS */}
       <div className="dashboard-stats">
 
-        <div className="stat-box">
+        {/* TOTAL */}
+        <div className="dashboard-stat-card">
 
-          <FaBriefcase className="blue" />
+          <FaBriefcase className="stat-icon" />
 
           <div>
-            <h2>12</h2>
+
+            <h2>{stats.total}</h2>
+
             <p>Total Applied</p>
+
           </div>
 
         </div>
 
-        <div className="stat-box">
+        {/* ACCEPTED */}
+        <div className="dashboard-stat-card">
 
-          <FaCheckCircle className="green" />
+          <FaCheckCircle className="stat-icon accepted" />
 
           <div>
-            <h2>4</h2>
+
+            <h2>{stats.accepted}</h2>
+
             <p>Accepted</p>
+
           </div>
 
         </div>
 
-        <div className="stat-box">
+        {/* REJECTED */}
+        <div className="dashboard-stat-card">
 
-          <FaClock className="orange" />
-
-          <div>
-            <h2>5</h2>
-            <p>Pending</p>
-          </div>
-
-        </div>
-
-        <div className="stat-box">
-
-          <FaTimesCircle className="red" />
+          <FaTimesCircle className="stat-icon rejected" />
 
           <div>
-            <h2>3</h2>
+
+            <h2>{stats.rejected}</h2>
+
             <p>Rejected</p>
+
+          </div>
+
+        </div>
+
+        {/* PENDING */}
+        <div className="dashboard-stat-card">
+
+          <FaClock className="stat-icon pending" />
+
+          <div>
+
+            <h2>{stats.pending}</h2>
+
+            <p>Pending</p>
+
           </div>
 
         </div>
@@ -99,33 +159,62 @@ export default function Dashboard() {
       </div>
 
       {/* APPLICATIONS */}
-      <div className="applications-section">
+      <div className="dashboard-applications">
 
-        {applications.map((app) => (
+        <h1>My Applications</h1>
 
-          <div className="application-card" key={app.id}>
+        <div className="applications-grid">
 
-            <div className="application-left">
+          {applications.map((app) => (
 
-              <h2>{app.title}</h2>
+            <div
+              className="application-card"
+              key={app._id}
+            >
 
-              <p>{app.company}</p>
+              <h2>
 
-            </div>
+                {app.job?.title}
 
-            <div className="application-right">
+              </h2>
 
-              <span className={`status ${app.status.toLowerCase()}`}>
+              <p>
+
+                {app.job?.companyName}
+
+              </p>
+
+              <span className={`status ${app.status}`}>
 
                 {app.status}
 
               </span>
 
+              <div className="application-info">
+
+                <p>
+
+                  <strong>Location:</strong>
+
+                  {app.job?.location}
+
+                </p>
+
+                <p>
+
+                  <strong>Salary:</strong>
+
+                  ₹{app.job?.salary}
+
+                </p>
+
+              </div>
+
             </div>
 
-          </div>
+          ))}
 
-        ))}
+        </div>
 
       </div>
 

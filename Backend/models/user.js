@@ -7,6 +7,15 @@ const userSchema = new mongoose.Schema({
 
   resume: String,
   resumePublicID: String,
+  skills: String,
+
+  experience: String,
+
+  qualification: String,
+
+  bio: String,
+
+  profilePhoto: String,
 
   role: {
     type: String,

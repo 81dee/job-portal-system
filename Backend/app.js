@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.routes.js";
 import companyRoutes from "./routes/company.routes.js";
 import { protect } from "./middlewares/auth.middleware.js";
 import cors from "cors";
+import path from "path";
 
  
 
@@ -23,6 +24,12 @@ const app = express();
 // middleware
 app.use(express.json());
 app.use(cors());
+app.use(
+
+  "/uploads",
+
+  express.static("uploads")
+);
 
 //routes
 app.use("/api/auth", authRoutes);

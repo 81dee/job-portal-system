@@ -1,12 +1,11 @@
 import Job from "../models/job.js";
 import Company from "../models/company.js";
+import User from "../models/user.js";
 
 // CREATE JOB
 export const createJob = async (req, res) => {
 
     try {
-
-        console.log(req.body);
 
         const {
             title,
@@ -18,15 +17,23 @@ export const createJob = async (req, res) => {
             location
         } = req.body;
 
-        if(req.user.role === "recruiter" && !req.user.isApproved){
+        const recruiter = await User.findById(req.user.id);
 
-              return res.status(403).json({
+          if (
 
-              success: false,
+           recruiter.role === "recruiter" &&
+
+           !recruiter.isApproved
+
+        ) {
+
+          return res.status(403).json({
+
+            success: false,
 
               message: "Recruiter not approved by admin"
            });
-        }
+       }
 
         const newJob = await Job.create({
 
@@ -38,7 +45,7 @@ export const createJob = async (req, res) => {
             salary,
             location,
 
-            createdBy: req.user?._id
+            createdBy: req.user._id
         });
 
         res.status(201).json({
@@ -61,7 +68,13 @@ export const createJob = async (req, res) => {
 // GET ALL JOBS
 export const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find();
+    const jobs = await Job.find()
+    .populate(
+
+        "createdBy",
+
+        "name email companyName"
+    );
 
     res.json(jobs);
 
@@ -74,7 +87,9 @@ export const getRecruiterJobs = async (req, res) => {
 
     try {
 
-        const jobs = await Job.find();
+        const jobs = await Job.find({
+            createdBy: req.user.id
+        });
 
         res.status(200).json(jobs);
 

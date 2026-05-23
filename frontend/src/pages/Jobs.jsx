@@ -4,6 +4,8 @@ import API from "../services/api";
 
 import Loader from "../components/Loader";
 
+import ApplyModal from "../components/ApplyModal";
+
 import {
   FaMapMarkerAlt,
   FaMoneyBillWave,
@@ -22,6 +24,8 @@ export default function Jobs() {
   const [search, setSearch] = useState("");
 
   const [category, setCategory] = useState("All");
+
+  const [selectedJob, setSelectedJob] = useState(null);
 
   // FETCH JOBS
   const fetchJobs = async () => {
@@ -51,25 +55,6 @@ export default function Jobs() {
     fetchJobs();
 
   }, []);
-
-  // APPLY JOB
-  const applyJob = async (jobId) => {
-
-    try {
-
-      await API.post(
-        `/application/apply/${jobId}`
-      );
-
-      alert("Applied Successfully");
-
-    } catch (err) {
-
-      console.log(err);
-
-      alert("Error applying");
-    }
-  };
 
   if (loading) return <Loader />;
 
@@ -263,7 +248,7 @@ export default function Jobs() {
               <button
                 className="apply-btn"
                 onClick={() =>
-                  applyJob(job._id)
+                  setSelectedJob(job)
                 }
               >
 
@@ -286,6 +271,17 @@ export default function Jobs() {
         ))}
 
       </div>
+       {selectedJob && (
+
+         <ApplyModal
+
+           job={selectedJob}
+
+           closeModal={() =>
+             setSelectedJob(null)
+           }
+         />
+       )}
 
     </div>
   );

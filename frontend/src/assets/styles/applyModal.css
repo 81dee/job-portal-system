@@ -1,0 +1,124 @@
+.apply-modal-overlay{
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.6);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 999;
+}
+
+.apply-modal{
+
+    width: 90%;
+
+    max-width: 650px;
+
+    background: rgba(255,255,255,0.12);
+
+    backdrop-filter: blur(20px);
+
+    padding: 35px;
+
+    border-radius: 24px;
+
+    border: 1px solid rgba(255,255,255,0.2);
+
+    color: white;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+}
+
+.apply-modal h2{
+
+    text-align: center;
+
+    margin-bottom: 25px;
+
+    font-size: 32px;
+}
+
+.apply-modal form{
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+.apply-modal input{
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    border: none;
+
+    outline: none;
+
+    font-size: 15px;
+
+    background: rgba(255,255,255,0.15);
+
+    color: white;
+}
+
+.apply-modal input::placeholder{
+
+    color: rgba(205, 192, 227, 0.812);
+}
+
+.apply-actions{
+
+    display: flex;
+
+    gap: 15px;
+
+    margin-top: 15px;
+}
+
+.apply-actions button{
+
+    flex: 1;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+      linear-gradient(
+        to right,
+        #4f46e5,
+        #9333ea
+      );
+}
+
+.cancel-btn{
+
+    background:
+      linear-gradient(
+        to right,
+        #ef4444,
+        #dc2626
+      ) !important;
+}

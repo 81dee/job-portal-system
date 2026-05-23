@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
 import AdminRegister from "./pages/AdminRegister";
+import RecruiterApplications from "./pages/RecruiterApplications";
 
 import "./assets/styles/layout.css";
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/admin-register" element={<AdminRegister />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/recruiter-applications" element={<RecruiterApplications />} />
           </Routes>
         </main>
 

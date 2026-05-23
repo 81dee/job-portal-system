@@ -17,6 +17,8 @@ const jobSchema = new mongoose.Schema({
         required: true
     },
 
+    companyLogo: String,
+
     category: {
         type: String,
         required: true,
