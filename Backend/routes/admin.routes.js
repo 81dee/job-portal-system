@@ -1,7 +1,7 @@
 import express from "express";
-import User from "..//models/user.js";
-import { protect } from "..//middlewares/auth.middleware.js";
-import { authorizeRoles } from "..//middlewares/role.middleware.js";
+import User from "../models/user.js";
+import { protect } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 import {
   getPendingRecruiters,
   approveRecruiter

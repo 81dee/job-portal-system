@@ -16,6 +16,8 @@ import {
 
 import "../assets/styles/recruiterApplications.css";
 
+const UPLOADS_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "");
+
 export default function RecruiterApplications() {
 
   const [applications, setApplications] = useState([]);
@@ -226,7 +228,7 @@ export default function RecruiterApplications() {
 
                 <a
 
-                  href={`http://localhost:3000/uploads/${app.resume}`}
+                  href={`${UPLOADS_BASE}/uploads/${app.resume}`}
 
                   target="_blank"
 
