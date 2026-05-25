@@ -1,6 +1,8 @@
 import Application from "../models/application.js";
 import Job from "../models/job.js";
 import Notification from "../models/notification.js";
+import { uploadResumeFile, isCloudinaryConfigured } from "../utils/cloudinaryUpload.js";
+import { attachResumeUrl } from "../utils/resumeUrl.js";
 
 // APPLY JOB
 export const applyJob = async (req, res) => {
@@ -50,6 +52,23 @@ export const applyJob = async (req, res) => {
       });
     }
 
+    let resumeValue = null;
+
+    if (req.file) {
+      if (isCloudinaryConfigured()) {
+        const result = await uploadResumeFile(req.file);
+        resumeValue = result.secure_url;
+      } else {
+        console.warn(
+          "Cloudinary not configured — resume stored as filename only (may not work in production)"
+        );
+        resumeValue =
+          req.file.filename ||
+          req.file.originalname ||
+          `resume-${Date.now()}`;
+      }
+    }
+
     // CREATE APPLICATION
     const application = await Application.create({
 
@@ -77,7 +96,7 @@ export const applyJob = async (req, res) => {
 
       location,
 
-      resume: req.file?.path,
+      resume: resumeValue,
 
       status: "pending"
     });
@@ -88,7 +107,7 @@ export const applyJob = async (req, res) => {
 
       message: "Application submitted",
 
-      application
+      application: attachResumeUrl(application)
     });
 
   } catch (err) {
@@ -120,7 +139,7 @@ export const getMyApplications = async (req, res) => {
       createdAt: -1
     });
 
-    res.json(applications);
+    res.json(applications.map(attachResumeUrl));
 
   } catch (err) {
 
@@ -274,7 +293,7 @@ export const getRecruiterApplications = async (
       createdAt: -1
     });
 
-    res.json(applications);
+    res.json(applications.map(attachResumeUrl));
 
   } catch (err) {
 
@@ -282,6 +301,55 @@ export const getRecruiterApplications = async (
 
       error: err.message
     });
+  }
+};
+
+// VIEW / DOWNLOAD RESUME (recruiter or applicant)
+export const getApplicationResume = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.applicationId)
+      .populate("job", "title companyName createdBy");
+
+    if (!application || !application.resume) {
+      return res.status(404).json({ message: "Resume not found" });
+    }
+
+    const isRecruiter =
+      req.user.role === "recruiter" &&
+      application.job &&
+      String(application.job.createdBy) === String(req.user.id);
+
+    const isOwner = String(application.user) === String(req.user.id);
+
+    if (!isRecruiter && !isOwner && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    // Cloudinary / external URL
+    if (/^https?:\/\//i.test(application.resume)) {
+      return res.redirect(application.resume);
+    }
+
+    // Local file (dev only — ephemeral on Render)
+    const fs = await import("fs");
+    const path = await import("path");
+    const { fileURLToPath } = await import("url");
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const fileName = application.resume
+      .replace(/\\/g, "/")
+      .replace(/^\/?uploads\//, "");
+    const filePath = path.join(__dirname, "..", "uploads", fileName);
+
+    if (fs.existsSync(filePath)) {
+      return res.download(filePath, fileName);
+    }
+
+    return res.status(404).json({
+      message:
+        "Resume file is no longer on the server. Ask the applicant to submit again.",
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 };
 

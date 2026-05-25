@@ -1,303 +1,97 @@
 import { useState } from "react";
-
+import { Link, useNavigate } from "react-router-dom";
 import {
-
-  Link,
-
-  useNavigate
-
-} from "react-router-dom";
-
-import {
-
-  FaSearch,
   FaBriefcase,
   FaUsers,
-  FaBuilding
-
+  FaBuilding,
 } from "react-icons/fa";
+import SearchBar from "../components/ui/SearchBar";
+import StatCard from "../components/ui/StatCard";
 
-import "../assets/styles/home.css";
+const CATEGORIES = [
+  { label: "Technology", emoji: "💻" },
+  { label: "Finance", emoji: "💰" },
+  { label: "Healthcare", emoji: "🏥" },
+  { label: "Marketing", emoji: "📈" },
+  { label: "Design", emoji: "🎨" },
+  { label: "Cyber Security", emoji: "🛡" },
+];
 
 export default function Home() {
-
   const navigate = useNavigate();
-
   const [search, setSearch] = useState("");
 
-  // SEARCH FUNCTION
   const handleSearch = () => {
-
-    if (!search.trim()) {
-
-      return;
-    }
-
-    navigate(
-
-      `/jobs?search=${search}`
-    );
-  };
-
-  // CATEGORY FUNCTION
-  const handleCategory = (category) => {
-
-    navigate(
-
-      `/jobs?category=${category}`
-    );
+    if (!search.trim()) return;
+    navigate(`/jobs?search=${encodeURIComponent(search)}`);
   };
 
   return (
-
-    <div className="home">
-
-      {/* HERO SECTION */}
-      <section className="hero-section">
-
-        <div className="hero-content">
-
-          <h1>
-
-            Find Your Dream Job
-
-            <span>
-
-              {" "}Faster 🚀
-
-            </span>
-
+    <div>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero__inner">
+          <h1 id="hero-title" className="hero__title animate-in">
+            Find your dream job <span>faster</span>
           </h1>
-
-          <p>
-
-            Apply to jobs, track applications,
-            connect with recruiters,
-            and grow your career —
-            all in one professional platform.
-
+          <p className="hero__subtitle animate-in animate-in-delay-1">
+            Apply to roles, track applications, and connect with recruiters —
+            all in one professional platform built for modern careers.
           </p>
 
-          {/* SEARCH BAR */}
-          <div className="search-box">
-
-            <FaSearch className="search-icon" />
-
-            <input
-              type="text"
-              placeholder="Search jobs, companies, skills..."
+          <div className="animate-in animate-in-delay-2" style={{ maxWidth: 640, margin: "0 auto" }}>
+            <SearchBar
               value={search}
-              onChange={(e)=>
-
-                setSearch(e.target.value)
-              }
+              onChange={(e) => setSearch(e.target.value)}
+              onSubmit={handleSearch}
+              placeholder="Search jobs, companies, skills…"
             />
-
-            <button onClick={handleSearch}>
-
-              Search
-
-            </button>
-
           </div>
 
-          {/* BUTTONS */}
-          <div className="hero-buttons">
-
-            <Link to="/jobs">
-
-              <button className="btn primary">
-
-                Browse Jobs
-
-              </button>
-
+          <div className="hero__actions animate-in animate-in-delay-3">
+            <Link to="/jobs" className="btn btn--primary btn--lg">
+              Browse jobs
             </Link>
-
-            <Link to="/login">
-
-              <button className="btn secondary">
-
-                Login
-
-              </button>
-
+            <Link to="/login" className="btn btn--secondary btn--lg">
+              Sign in
             </Link>
-
-            <Link to="/register">
-
-              <button className="btn register">
-
-                Register
-
-              </button>
-
+            <Link to="/register" className="btn btn--ghost btn--lg" style={{ color: "white" }}>
+              Create account
             </Link>
-
           </div>
-
         </div>
-
       </section>
 
-      {/* STATS */}
-      <section className="stats-section">
-
-        <div className="stat-card">
-
-          <FaBriefcase className="stat-icon blue" />
-
-          <h2>
-
-            5K+
-
-          </h2>
-
-          <p>
-
-            Active Jobs
-
-          </p>
-
+      <section className="section section--muted" aria-label="Platform statistics">
+        <div className="page">
+          <div className="grid-stats">
+            <StatCard icon={FaBriefcase} value="5K+" label="Active jobs" tone="primary" />
+            <StatCard icon={FaUsers} value="10K+" label="Job seekers" tone="accent" />
+            <StatCard icon={FaBuilding} value="500+" label="Companies" tone="warning" />
+          </div>
         </div>
-
-        <div className="stat-card">
-
-          <FaUsers className="stat-icon purple" />
-
-          <h2>
-
-            10K+
-
-          </h2>
-
-          <p>
-
-            Job Seekers
-
-          </p>
-
-        </div>
-
-        <div className="stat-card">
-
-          <FaBuilding className="stat-icon orange" />
-
-          <h2>
-
-            500+
-
-          </h2>
-
-          <p>
-
-            Companies
-
-          </p>
-
-        </div>
-
       </section>
 
-      {/* CATEGORIES */}
-      <section className="categories-section">
-
-        <h2>
-
-          Popular Categories
-
-        </h2>
-
-        <div className="categories-grid">
-
-          <div
-            className="category-card"
-            onClick={()=>
-
-              handleCategory(
-                "Technology"
-              )
-            }
-          >
-
-            💻 Technology
-
+      <section className="section" aria-labelledby="categories-title">
+        <div className="page">
+          <h2 id="categories-title" className="section__title">
+            Popular categories
+          </h2>
+          <div className="category-grid">
+            {CATEGORIES.map(({ label, emoji }) => (
+              <button
+                key={label}
+                type="button"
+                className="category-tile"
+                onClick={() =>
+                  navigate(`/jobs?category=${encodeURIComponent(label)}`)
+                }
+              >
+                {emoji} {label}
+              </button>
+            ))}
           </div>
-
-          <div
-            className="category-card"
-            onClick={()=>
-
-              handleCategory(
-                "Finance"
-              )
-            }
-          >
-
-            💰 Finance
-
-          </div>
-
-          <div
-            className="category-card"
-            onClick={()=>
-
-              handleCategory(
-                "Healthcare"
-              )
-            }
-          >
-
-            🏥 Healthcare
-
-          </div>
-
-          <div
-            className="category-card"
-            onClick={()=>
-
-              handleCategory(
-                "Marketing"
-              )
-            }
-          >
-
-            📈 Marketing
-
-          </div>
-
-          <div
-            className="category-card"
-            onClick={()=>
-
-              handleCategory(
-                "Design"
-              )
-            }
-          >
-
-            🎨 Design
-
-          </div>
-
-          <div
-            className="category-card"
-            onClick={()=>
-
-              handleCategory(
-                "Cyber Security"
-              )
-            }
-          >
-
-            🛡 Cyber Security
-
-          </div>
-
         </div>
-
       </section>
-
     </div>
   );
 }

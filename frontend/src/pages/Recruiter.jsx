@@ -12,7 +12,12 @@ import {
 
 import { Link } from "react-router-dom";
 
-import "../assets/styles/recruiter.css";
+import toast from "react-hot-toast";
+import PageHeader from "../components/ui/PageHeader";
+import StatCard from "../components/ui/StatCard";
+import Button from "../components/ui/Button";
+import EmptyState from "../components/ui/EmptyState";
+import Badge from "../components/ui/Badge";
 
 export default function Recruiter() {
 
@@ -92,15 +97,28 @@ export default function Recruiter() {
     }
   };
 
-  // USE EFFECT
   useEffect(() => {
-
-    if (token) {
-
-      fetchRecruiterJobs();
-    }
-
-  }, []);
+    if (!token) return;
+    let active = true;
+    (async () => {
+      try {
+        const res = await API.get("/job/recruiter-jobs", config);
+        if (active) {
+          setJobs(Array.isArray(res.data) ? res.data : []);
+        }
+      } catch (error) {
+        console.log(error);
+        if (active) {
+          alert(
+            error?.response?.data?.message || "Failed to load jobs"
+          );
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [token]);
 
   // HANDLE CHANGE
   const handleChange = (e) => {
@@ -206,7 +224,7 @@ export default function Recruiter() {
           config
         );
 
-        alert("Job Updated Successfully");
+        toast.success("Job updated");
 
         setEditingId(null);
 
@@ -222,7 +240,7 @@ export default function Recruiter() {
           config
         );
 
-        alert("Job Created Successfully");
+        toast.success("Job created");
       }
 
       // RESET FORM
@@ -281,7 +299,7 @@ export default function Recruiter() {
         config
       );
 
-      alert("Job Deleted");
+      toast.success("Job deleted");
 
       fetchRecruiterJobs();
 
@@ -300,88 +318,42 @@ export default function Recruiter() {
 
   return (
 
-    <div className="recruiter-page">
+    <div className="page page--dashboard">
 
-      {/* DASHBOARD TOP */}
-      <div className="dashboard-top">
+      <PageHeader
+        eyebrow="Recruiter"
+        title="Recruiter dashboard"
+        subtitle="Post roles and manage your job listings."
+      />
 
-        <div className="dashboard-card">
-
-          <FaBriefcase />
-
-          <div>
-
-            <h2>{jobs.length}</h2>
-
-            <p>Total Jobs</p>
-
+      <div className="grid-stats" style={{ marginBottom: "var(--space-8)" }}>
+        <StatCard icon={FaBriefcase} value={jobs.length} label="Total jobs" tone="primary" />
+        <StatCard
+          icon={FaPlusCircle}
+          value={editingId ? "Edit" : "New"}
+          label={editingId ? "Update listing" : "Create listing"}
+          tone="accent"
+        />
+        <div className="stat-card">
+          <div className="stat-card__icon stat-card__icon--success">
+            <FaUsers aria-hidden />
           </div>
-
-        </div>
-
-        <div className="dashboard-card">
-
-          <FaPlusCircle />
-
           <div>
-
-            <h2>
-
-              {editingId
-
-                ? "Edit"
-
-                : "Create"}
-
-            </h2>
-
-            <p>
-
-              {editingId
-
-                ? "Update Job"
-
-                : "New Opportunity"}
-
-            </p>
-
-          </div>
-
-        </div>
-
-        <div className="dashboard-card">
-
-          <FaUsers />
-
-          <div>
-
-            <Link
-              to="/recruiter-applications"
-              className="applicant-link"
-            >
-
-              View Applicants
-
+            <Link to="/recruiter-applications" className="btn btn--primary btn--sm">
+              View applicants
             </Link>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* FORM */}
-      <div className="recruiter-container">
+      <div className="recruiter-layout">
+      <div className="card card--elevated recruiter-form">
 
-        <h1>
+        <h2 style={{ marginBottom: "var(--space-6)" }}>
 
-          {editingId
+          {editingId ? "Edit job" : "Create new job"}
 
-            ? "Edit Job"
-
-            : "Create New Job"}
-
-        </h1>
+        </h2>
 
         <form onSubmit={handleSubmit}>
 
@@ -522,141 +494,44 @@ export default function Recruiter() {
 
           </select>
 
-          {/* BUTTON */}
-          <button
-            type="submit"
-            disabled={loading}
-          >
-
-            {loading
-
-              ? "Please Wait..."
-
-              : editingId
-
-              ? "Update Job"
-
-              : "Create Job"}
-
-          </button>
+          <Button type="submit" disabled={loading} block>
+            {loading ? "Please wait…" : editingId ? "Update job" : "Create job"}
+          </Button>
 
         </form>
 
       </div>
 
-      {/* JOBS */}
-      <div className="recruiter-jobs">
-
-        <h2>Your Posted Jobs</h2>
-
-        <div className="recruiter-jobs-grid">
+      <div>
+        <h2 style={{ marginBottom: "var(--space-6)" }}>Your posted jobs</h2>
 
           {jobs.length > 0 ? (
-
             jobs.map((job) => (
-
-              <div
-                className="recruiter-job-card"
-                key={job._id}
-              >
-
-                <h3>{job.title}</h3>
-
-                <p>
-
-                  {
-                    job.description?.slice(
-                      0,
-                      120
-                    )
-                  }...
-
-                </p>
-
-                <span>
-
-                  {job.category}
-
-                </span>
-
-                <div className="job-card-info">
-
-                  <p>
-
-                    <strong>Company:</strong>
-
-                    {job.companyName}
-
+              <div className="recruiter-job-item" key={job._id}>
+                <div>
+                  <h3>{job.title}</h3>
+                  <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-muted)", margin: "var(--space-1) 0" }}>
+                    {job.description?.slice(0, 100)}…
                   </p>
-
-                  <p>
-
-                    <strong>Salary:</strong>
-
-                    {job.salary}
-
+                  <Badge>{job.category}</Badge>
+                  <p style={{ fontSize: "var(--text-sm)", marginTop: "var(--space-2)" }}>
+                    {job.companyName} · ₹{job.salary} · {job.workMode}
                   </p>
-
-                  <p>
-
-                    <strong>Mode:</strong>
-
-                    {job.workMode}
-
-                  </p>
-
                 </div>
-
-                {/* ACTION BUTTONS */}
-                <div className="job-actions">
-
-                  {/* EDIT */}
-                  <button
-                    className="edit-btn"
-                    onClick={() => editJob(job)}
-                  >
-
-                    <FaEdit />
-
-                    Edit
-
-                  </button>
-
-                  {/* DELETE */}
-                  <button
-                    className="delete-btn"
-                    onClick={() =>
-                      deleteJob(job._id)
-                    }
-                  >
-
-                    <FaTrash />
-
-                    Delete
-
-                  </button>
-
+                <div className="recruiter-job-item__actions">
+                  <Button variant="secondary" size="sm" onClick={() => editJob(job)}>
+                    <FaEdit aria-hidden /> Edit
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={() => deleteJob(job._id)}>
+                    <FaTrash aria-hidden /> Delete
+                  </Button>
                 </div>
-
               </div>
-
             ))
-
           ) : (
-
-            <div className="no-jobs">
-
-              <h2>
-
-                No Jobs Posted Yet
-
-              </h2>
-
-            </div>
+            <EmptyState title="No jobs posted yet" description="Create your first listing using the form." />
           )}
-
-        </div>
-
+      </div>
       </div>
 
     </div>

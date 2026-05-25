@@ -1,19 +1,11 @@
-import { useState } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import API from "../services/api";
+import toast from "react-hot-toast";
+import Button from "./ui/Button";
 
-import "../assets/styles/applyModal.css";
-
-export default function ApplyModal({
-
-  job,
-
-  closeModal
-
-}) {
-
+export default function ApplyModal({ job, closeModal }) {
+  const dialogRef = useRef(null);
   const [formData, setFormData] = useState({
-
     fullName: "",
     email: "",
     phone: "",
@@ -22,204 +14,119 @@ export default function ApplyModal({
     skills: "",
     currentCompany: "",
     expectedSalary: "",
-    location: ""
-
+    location: "",
   });
-
   const [resume, setResume] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // HANDLE CHANGE
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [closeModal]);
+
   const handleChange = (e) => {
-
-    setFormData({
-
-      ...formData,
-
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // SUBMIT
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-
+    setLoading(true);
     try {
-
       const token = localStorage.getItem("token");
-
       const data = new FormData();
-
-      // APPEND TEXT DATA
-      Object.keys(formData).forEach((key) => {
-
-        data.append(
-
-          key,
-
-          formData[key]
-        );
-      });
-
-      // APPEND FILE
+      Object.keys(formData).forEach((key) => data.append(key, formData[key]));
       data.append("resume", resume);
 
-      await API.post(
+      await API.post(`/application/apply/${job._id}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        `/application/apply/${job._id}`,
-
-        data,
-
-        {
-
-          headers: {
-
-            Authorization: `Bearer ${token}`,
-
-            "Content-Type":
-              "multipart/form-data"
-          }
-        }
-      );
-
-      alert("Application submitted");
-
+      toast.success("Application submitted");
       closeModal();
-
     } catch (err) {
-
-      console.log(err);
-
-      alert(
-
-        err?.response?.data?.message ||
-
-        "Application failed"
-      );
+      toast.error(err?.response?.data?.message || "Application failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
-    <div className="apply-modal-overlay">
-
-      <div className="apply-modal">
-
-        <h2>
-
+    <div
+      className="modal-overlay"
+      role="presentation"
+      onClick={closeModal}
+    >
+      <div
+        ref={dialogRef}
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="apply-modal-title"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 id="apply-modal-title" className="modal__title">
           Apply for {job.title}
-
         </h2>
 
         <form onSubmit={handleSubmit}>
+          {[
+            ["fullName", "Full name", "text"],
+            ["email", "Email", "email"],
+            ["phone", "Phone", "tel"],
+            ["qualification", "Qualification", "text"],
+            ["experience", "Experience", "text"],
+            ["skills", "Skills", "text"],
+            ["currentCompany", "Current company", "text"],
+            ["expectedSalary", "Expected salary", "text"],
+            ["location", "Location", "text"],
+          ].map(([name, placeholder, type]) => (
+            <input
+              key={name}
+              className="form-input"
+              style={{ display: "block", width: "100%", marginBottom: "var(--space-4)", padding: "0.75rem 1rem" }}
+              type={type}
+              name={name}
+              placeholder={placeholder}
+              onChange={handleChange}
+              required={name !== "currentCompany" && name !== "expectedSalary"}
+            />
+          ))}
 
+          <label className="form-label" htmlFor="resume">
+            Resume (PDF, DOC)
+          </label>
           <input
-            type="text"
-            name="fullName"
-            placeholder="Full Name"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone Number"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="qualification"
-            placeholder="Qualification"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="experience"
-            placeholder="Experience"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="skills"
-            placeholder="Skills"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="currentCompany"
-            placeholder="Current Company"
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            name="expectedSalary"
-            placeholder="Expected Salary"
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            onChange={handleChange}
-          />
-
-          {/* RESUME */}
-          <input
+            id="resume"
             type="file"
             accept=".pdf,.doc,.docx"
-            onChange={(e) =>
-
-              setResume(
-                e.target.files[0]
-              )
-            }
+            className="form-input"
+            style={{ padding: "var(--space-3)", width: "100%" }}
+            onChange={(e) => setResume(e.target.files[0])}
             required
           />
 
-          {/* BUTTONS */}
-          <div className="apply-actions">
-
-            <button type="submit">
-
-              Submit Application
-
-            </button>
-
-            <button
-              type="button"
-              className="cancel-btn"
-              onClick={closeModal}
-            >
-
+          <div className="modal__actions">
+            <Button type="submit" disabled={loading} block>
+              {loading ? "Submitting…" : "Submit application"}
+            </Button>
+            <Button type="button" variant="secondary" onClick={closeModal}>
               Cancel
-
-            </button>
-
+            </Button>
           </div>
-
         </form>
-
       </div>
-
     </div>
   );
 }

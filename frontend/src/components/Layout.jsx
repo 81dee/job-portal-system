@@ -1,12 +1,17 @@
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 export default function Layout({ children }) {
   return (
-    <div>
+    <div className="app-container">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <Navbar />
-      <div style={{ padding: "20px" }}>
+      <main id="main-content" className="main-content">
         {children}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

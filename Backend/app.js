@@ -13,8 +13,10 @@ import { protect } from "./middlewares/auth.middleware.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from "url";
 
- 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 config();
 connectDB();
@@ -26,10 +28,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(
-
   "/uploads",
-
-  express.static("uploads")
+  express.static(path.join(__dirname, "uploads"))
 );
 
 //routes

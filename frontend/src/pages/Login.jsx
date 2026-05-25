@@ -1,150 +1,78 @@
 import { useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-
-import {
-  FaEnvelope,
-  FaLock
-} from "react-icons/fa";
-
+import { FaEnvelope, FaLock } from "react-icons/fa";
+import toast from "react-hot-toast";
 import API from "../services/api";
-
-import "../assets/styles/login.css";
+import { useAuth } from "../hooks/useAuth";
+import InputField from "../components/ui/InputField";
+import Button from "../components/ui/Button";
 
 export default function Login() {
-
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-
-    email: "",
-    password: ""
-
-  });
+  const { setUser } = useAuth();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-
-    setFormData({
-
-      ...formData,
-
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-
+    setLoading(true);
     try {
-
-      const res = await API.post(
-
-        "/auth/login",
-
-        formData
-      );
-
-      localStorage.setItem(
-
-        "token",
-
-        res.data.token
-      );
-
-      localStorage.setItem(
-
-        "user",
-
-        JSON.stringify(res.data.user)
-      );
-
-      alert("Login Successful");
-
+      const res = await API.post("/auth/login", formData);
+      setUser(res.data.user, res.data.token);
+      toast.success("Welcome back!");
       navigate("/");
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert("Invalid Credentials");
+    } catch {
+      toast.error("Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
-    <div className="login-page">
-
-      <div className="login-card">
-
-        <h1>Welcome Back</h1>
-
-        <p className="login-subtitle">
-
-          Login and continue your career journey.
-
+    <div className="page--auth">
+      <div className="auth-card">
+        <h1 className="auth-card__title">Welcome back</h1>
+        <p className="auth-card__subtitle">
+          Sign in to continue your career journey.
         </p>
 
-        <form onSubmit={handleSubmit}>
-
-          {/* EMAIL */}
-          <div className="input-box">
-
-            <FaEnvelope className="input-icon" />
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-
-          </div>
-
-          {/* PASSWORD */}
-          <div className="input-box">
-
-            <FaLock className="input-icon" />
-
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-
-          </div>
-
-          <button type="submit">
-
-            Login
-
-          </button>
-
+        <form onSubmit={handleSubmit} noValidate>
+          <InputField
+            label="Email"
+            type="email"
+            name="email"
+            icon={FaEnvelope}
+            placeholder="you@email.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            autoComplete="email"
+          />
+          <InputField
+            label="Password"
+            type="password"
+            name="password"
+            icon={FaLock}
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            autoComplete="current-password"
+          />
+          <Button type="submit" block size="lg" disabled={loading}>
+            {loading ? "Signing in…" : "Sign in"}
+          </Button>
         </form>
 
-        <div className="login-footer">
-
-          <p>
-
-            Don’t have an account?
-
-          </p>
-
-          <Link to="/register">
-
-            Register
-
-          </Link>
-
+        <div className="auth-card__footer">
+          <span>Don&apos;t have an account?</span>
+          <Link to="/register">Register</Link>
         </div>
-
       </div>
-
     </div>
   );
 }

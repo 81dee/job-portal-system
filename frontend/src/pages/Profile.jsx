@@ -4,7 +4,8 @@ import API from "../services/api";
 
 import toast from "react-hot-toast";
 
-import "../assets/styles/profile.css";
+import PageHeader from "../components/ui/PageHeader";
+import Button from "../components/ui/Button";
 
 export default function Profile() {
 
@@ -117,18 +118,18 @@ export default function Profile() {
 
   return (
 
-    <div className="profile-page">
+    <div className="page page--narrow">
+
+      <PageHeader
+        eyebrow="Account"
+        title="Edit profile"
+        subtitle="Keep your skills and experience up to date for recruiters."
+      />
 
       <form
-        className="profile-form"
+        className="card profile-form"
         onSubmit={handleSubmit}
       >
-
-        <h1>
-
-          Edit Profile
-
-        </h1>
 
         <input
           type="text"
@@ -168,11 +169,11 @@ export default function Profile() {
           }
         />
 
-        <button type="submit">
+        <Button type="submit" block size="lg">
 
-          Update Profile
+          Update profile
 
-        </button>
+        </Button>
 
       </form>
 

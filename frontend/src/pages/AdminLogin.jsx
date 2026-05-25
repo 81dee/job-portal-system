@@ -1,193 +1,83 @@
 import { useState } from "react";
-
 import { useNavigate, Link } from "react-router-dom";
-
-import {
-  FaEnvelope,
-  FaLock,
-  FaUserShield
-} from "react-icons/fa";
-
+import { FaEnvelope, FaLock, FaUserShield } from "react-icons/fa";
+import toast from "react-hot-toast";
 import API from "../services/api";
-
-import "../assets/styles/login.css";
+import { useAuth } from "../hooks/useAuth";
+import InputField from "../components/ui/InputField";
+import Button from "../components/ui/Button";
 
 export default function AdminLogin() {
-
   const navigate = useNavigate();
+  const { setUser } = useAuth();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-  // FORM STATE
-  const [formData, setFormData] = useState({
-
-    email: "",
-    password: ""
-
-  });
-
-  // HANDLE INPUT CHANGE
   const handleChange = (e) => {
-
-    setFormData({
-
-      ...formData,
-
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // HANDLE LOGIN
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-
+    setLoading(true);
     try {
-
-      const res = await API.post(
-
-        "/auth/login",
-
-        formData
-      );
-
-      // CHECK SUCCESS
-      if (!res.data.success) {
-
-        alert(
-          res.data.message
-        );
-
+      const res = await API.post("/auth/login", formData);
+      if (!res.data.success || res.data.user.role !== "admin") {
+        toast.error("Not an admin account");
         return;
       }
-
-      // CHECK ADMIN
-      if (
-        res.data.user.role !== "admin"
-      ) {
-
-        alert("Not an admin");
-
-        return;
-      }
-
-      // SAVE TOKEN
-      localStorage.setItem(
-
-        "token",
-
-        res.data.token
-      );
-
-      // SAVE USER
-      localStorage.setItem(
-
-        "user",
-
-        JSON.stringify(
-          res.data.user
-        )
-      );
-
-      alert("Admin Login Successful");
-
+      setUser(res.data.user, res.data.token);
+      toast.success("Admin access granted");
       navigate("/admin");
-
-    } catch (err) {
-
-      console.log(err);
-
-      alert("Login failed");
+    } catch {
+      toast.error("Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
-    <div className="login-page">
-
-      <div className="login-card">
-
-        {/* ICON */}
-        <div className="admin-icon">
-
+    <div className="page--auth">
+      <div className="auth-card">
+        <div className="auth-card__icon-wrap" aria-hidden>
           <FaUserShield />
-
         </div>
-
-        {/* TITLE */}
-        <h1>
-
-          Admin Login
-
+        <h1 className="auth-card__title" style={{ textAlign: "center" }}>
+          Admin login
         </h1>
-
-        <p className="login-subtitle">
-
-          Secure admin access for recruiter approvals.
-
+        <p className="auth-card__subtitle" style={{ textAlign: "center" }}>
+          Secure access for recruiter approvals.
         </p>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit}>
-
-          {/* EMAIL */}
-          <div className="input-box">
-
-            <FaEnvelope className="input-icon" />
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Admin Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-
-          </div>
-
-          {/* PASSWORD */}
-          <div className="input-box">
-
-            <FaLock className="input-icon" />
-
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-
-          </div>
-
-          {/* BUTTON */}
-          <button type="submit">
-
-            Login as Admin
-
-          </button>
-
+          <InputField
+            label="Admin email"
+            type="email"
+            name="email"
+            icon={FaEnvelope}
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            label="Password"
+            type="password"
+            name="password"
+            icon={FaLock}
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <Button type="submit" block size="lg" disabled={loading}>
+            {loading ? "Signing in…" : "Login as admin"}
+          </Button>
         </form>
 
-        {/* FOOTER */}
-        <div className="login-footer">
-
-          <p>
-
-            No admin account?
-
-          </p>
-
-          <Link to="/admin-register">
-
-            Register Admin
-
-          </Link>
-
+        <div className="auth-card__footer">
+          <span>No admin account?</span>
+          <Link to="/admin-register">Register admin</Link>
         </div>
-
       </div>
-
     </div>
   );
 }

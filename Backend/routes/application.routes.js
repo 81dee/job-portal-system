@@ -11,13 +11,18 @@ import {
 } from "../controllers/application.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/resumeUpload.middleware.js";
-import { getJobseekerStats } from "../controllers/application.controller.js";
+import { getJobseekerStats, getApplicationResume } from "../controllers/application.controller.js";
 
 const router =express.Router();
 
 router.post("/apply/:jobId", protect, upload.single("resume"),
  applyJob);
 router.get("/my", protect, getMyApplications);
+router.get(
+  "/resume/:applicationId",
+  protect,
+  getApplicationResume
+);
 router.get("/", getAllApplications);
 router.delete("/delete/:applicationId", protect, deleteApplication);
 

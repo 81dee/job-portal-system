@@ -1,246 +1,119 @@
 import { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
-
+import { FaUsers, FaCheckCircle, FaBuilding } from "react-icons/fa";
+import toast from "react-hot-toast";
 import API from "../services/api";
-
-import {
-  FaUsers,
-  FaCheckCircle,
-  FaBuilding,
-  FaUserShield
-} from "react-icons/fa";
-
-import "../assets/styles/admin.css";
+import PageHeader from "../components/ui/PageHeader";
+import StatCard from "../components/ui/StatCard";
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
+import EmptyState from "../components/ui/EmptyState";
 
 export default function Admin() {
-
   const navigate = useNavigate();
-
   const [recruiters, setRecruiters] = useState([]);
 
-  // PROTECT ADMIN PAGE
   useEffect(() => {
-
-    const user = JSON.parse(
-      localStorage.getItem("user")
-    );
-
-    if (!user || user.role !== "admin") {
-
-      navigate("/admin-login");
-    }
-
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || user.role !== "admin") navigate("/admin-login");
   }, [navigate]);
 
-  // FETCH PENDING RECRUITERS
   const fetchRecruiters = async () => {
-
     try {
-
       const token = localStorage.getItem("token");
-
-      const res = await API.get(
-
-        "/admin/pending-recruiters",
-
-        {
-          headers: {
-
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      setRecruiters(res.data);
-
+      const res = await API.get("/admin/pending-recruiters", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRecruiters(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-
       console.log(error);
     }
   };
 
   useEffect(() => {
-
-    fetchRecruiters();
-
+    let active = true;
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await API.get("/admin/pending-recruiters", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (active) setRecruiters(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  // APPROVE RECRUITER
   const approveRecruiter = async (id) => {
-
     try {
-
       const token = localStorage.getItem("token");
-
-      await API.put(
-
-        `/admin/approve/${id}`,
-
-        {},
-
-        {
-          headers: {
-
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      alert("Recruiter Approved");
-
+      await API.put(`/admin/approve/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Recruiter approved");
       fetchRecruiters();
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert("Approval Failed");
+    } catch {
+      toast.error("Approval failed");
     }
   };
 
   return (
+    <div className="page page--dashboard">
+      <PageHeader
+        eyebrow="Administration"
+        title="Admin dashboard"
+        subtitle="Review and approve recruiter registrations."
+      />
 
-    <div className="admin-page">
-
-      {/* HEADER */}
-      <div className="admin-header">
-
-        <h1>
-
-          <FaUserShield />
-
-          Admin Dashboard
-
-        </h1>
-
-        <p>
-          Approve recruiters and manage companies
-        </p>
-
+      <div className="grid-stats" style={{ marginBottom: "var(--space-10)" }}>
+        <StatCard
+          icon={FaUsers}
+          value={recruiters.length}
+          label="Pending recruiters"
+          tone="primary"
+        />
+        <StatCard
+          icon={FaBuilding}
+          value={recruiters.length}
+          label="Companies waiting"
+          tone="accent"
+        />
       </div>
 
-      {/* STATS */}
-      <div className="admin-stats">
+      <h2 style={{ marginBottom: "var(--space-6)", fontSize: "var(--text-xl)" }}>
+        Pending recruiter requests
+      </h2>
 
-        <div className="admin-stat-card">
-
-          <FaUsers className="stat-icon blue" />
-
-          <div>
-
-            <h2>
-              {recruiters.length}
-            </h2>
-
-            <p>
-              Pending Recruiters
-            </p>
-
-          </div>
-
-        </div>
-
-        <div className="admin-stat-card">
-
-          <FaBuilding className="stat-icon purple" />
-
-          <div>
-
-            <h2>
-              {recruiters.length}
-            </h2>
-
-            <p>
-              Companies Waiting
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* APPROVALS */}
-      <div className="approval-section">
-
-        <h2>
-          Pending Recruiter Requests
-        </h2>
-
-        <div className="approval-grid">
-
-          {recruiters.length > 0 ? (
-
-            recruiters.map((recruiter) => (
-
-              <div
-                className="approval-card"
-                key={recruiter._id}
-              >
-
-                <div className="approval-top">
-
-                  <div>
-
-                    <h3>
-                      {recruiter.name}
-                    </h3>
-
-                    <p>
-                      {recruiter.email}
-                    </p>
-
-                  </div>
-
-                  <span>
-                    Recruiter
-                  </span>
-
+      {recruiters.length > 0 ? (
+        <div className="grid-cards">
+          {recruiters.map((recruiter) => (
+            <article key={recruiter._id} className="card admin-approval-card">
+              <div className="admin-approval-card__top">
+                <div>
+                  <h3>{recruiter.name}</h3>
+                  <p style={{ color: "var(--color-text-muted)", fontSize: "var(--text-sm)" }}>
+                    {recruiter.email}
+                  </p>
                 </div>
-
-                <div className="company-box">
-
-                  <FaBuilding />
-
-                  <span>
-                    {recruiter.companyName}
-                  </span>
-
-                </div>
-
-                <button
-                  onClick={() =>
-                    approveRecruiter(recruiter._id)
-                  }
-                >
-
-                  <FaCheckCircle />
-
-                  Approve Recruiter
-
-                </button>
-
+                <Badge variant="neutral">Recruiter</Badge>
               </div>
-
-            ))
-
-          ) : (
-
-            <div className="empty-box">
-
-              <h3>
-                No Pending Recruiters
-              </h3>
-
-            </div>
-
-          )}
-
+              <div className="admin-approval-card__company">
+                <FaBuilding aria-hidden />
+                <span>{recruiter.companyName || "—"}</span>
+              </div>
+              <Button onClick={() => approveRecruiter(recruiter._id)}>
+                <FaCheckCircle aria-hidden /> Approve recruiter
+              </Button>
+            </article>
+          ))}
         </div>
-
-      </div>
-
+      ) : (
+        <EmptyState title="No pending recruiters" description="All recruiter requests are processed." />
+      )}
     </div>
   );
 }

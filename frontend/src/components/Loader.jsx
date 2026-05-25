@@ -1,9 +1,10 @@
 import { ClipLoader } from "react-spinners";
 
-export default function Loader() {
+export default function Loader({ label = "Loading…" }) {
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <ClipLoader color="blue" size={50} />
+    <div className="loader-page" role="status" aria-live="polite">
+      <ClipLoader color="var(--color-primary)" size={44} aria-hidden />
+      <span className="loader-page__label">{label}</span>
     </div>
   );
-}   
+}

@@ -1,326 +1,168 @@
 import { useEffect, useState } from "react";
-
-import API from "../services/api";
-
+import { useNavigate } from "react-router-dom";
 import {
-
   FaBriefcase,
   FaCheckCircle,
   FaTimesCircle,
   FaClock,
   FaBell,
   FaCalendarAlt,
-  FaUser
-
+  FaUser,
 } from "react-icons/fa";
-
+import API from "../services/api";
+import { getStoredToken } from "../hooks/useAuth";
 import Notifications from "../components/Notifications";
-
-import "../assets/styles/dashboard.css";
+import PageHeader from "../components/ui/PageHeader";
+import StatCard from "../components/ui/StatCard";
+import Badge from "../components/ui/Badge";
+import EmptyState from "../components/ui/EmptyState";
 
 export default function Dashboard() {
-
+  const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
-
   const [stats, setStats] = useState({
-
     total: 0,
     accepted: 0,
     rejected: 0,
-    pending: 0
-
+    pending: 0,
   });
 
-  const token = localStorage.getItem("token");
-
-  const user = JSON.parse(
-
-    localStorage.getItem("user")
-  );
-
-  // FETCH APPLICATIONS
-  const fetchApplications = async () => {
-
-    try {
-
-      const res = await API.get(
-
-        "/application/my",
-
-        {
-          headers: {
-
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      const data = Array.isArray(res.data)
-
-        ? res.data
-
-        : [];
-
-      setApplications(data);
-
-    } catch (error) {
-
-      console.log(error);
-    }
-  };
-
-  // FETCH STATS
-  const fetchStats = async () => {
-
-    try {
-
-      const res = await API.get(
-
-        "/application/jobseeker-stats",
-
-        {
-          headers: {
-
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      setStats(res.data);
-
-    } catch (error) {
-
-      console.log(error);
-    }
-  };
+  const token = getStoredToken();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   useEffect(() => {
-
-    fetchApplications();
-
-    fetchStats();
-
-  }, []);
+    const load = async () => {
+      try {
+        const [appsRes, statsRes] = await Promise.all([
+          API.get("/application/my", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          API.get("/application/jobseeker-stats", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        setApplications(Array.isArray(appsRes.data) ? appsRes.data : []);
+        setStats(statsRes.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (token) load();
+  }, [token]);
 
   return (
-
-    <div className="dashboard-page">
-
-      {/* PROFILE */}
-      <div className="profile-card">
-
-        <FaUser className="profile-icon" />
-
+    <div className="page page--dashboard">
+      <div className="profile-strip animate-in">
+        <div className="profile-strip__avatar" aria-hidden>
+          <FaUser />
+        </div>
         <div>
-
-          <h2>
-
-            {user?.name}
-
-          </h2>
-
-          <p>
-
+          <h2>{user?.name || "Job seeker"}</h2>
+          <p style={{ opacity: 0.85, fontSize: "var(--text-sm)" }}>
             {user?.email}
-
           </p>
-
-          <span>
-
-            Jobseeker
-          </span>
-
+          <span className="profile-strip__role">Job seeker</span>
         </div>
-
       </div>
 
-      {/* STATS */}
-      <div className="dashboard-stats">
-
-        <div className="stat-card">
-
-          <FaBriefcase />
-
-          <div>
-
-            <h2>{stats.total}</h2>
-
-            <p>Total Applied</p>
-
-          </div>
-
-        </div>
-
-        <div className="stat-card accepted">
-
-          <FaCheckCircle />
-
-          <div>
-
-            <h2>{stats.accepted}</h2>
-
-            <p>Accepted</p>
-
-          </div>
-
-        </div>
-
-        <div className="stat-card rejected">
-
-          <FaTimesCircle />
-
-          <div>
-
-            <h2>{stats.rejected}</h2>
-
-            <p>Rejected</p>
-
-          </div>
-
-        </div>
-
-        <div className="stat-card pending">
-
-          <FaClock />
-
-          <div>
-
-            <h2>{stats.pending}</h2>
-
-            <p>Pending</p>
-
-          </div>
-
-        </div>
-
+      <div className="grid-stats" style={{ marginBottom: "var(--space-10)" }}>
+        <StatCard
+          icon={FaBriefcase}
+          value={stats.total}
+          label="Total applied"
+          tone="primary"
+        />
+        <StatCard
+          icon={FaCheckCircle}
+          value={stats.accepted}
+          label="Accepted"
+          tone="success"
+        />
+        <StatCard
+          icon={FaTimesCircle}
+          value={stats.rejected}
+          label="Rejected"
+          tone="danger"
+        />
+        <StatCard
+          icon={FaClock}
+          value={stats.pending}
+          label="Pending"
+          tone="warning"
+        />
       </div>
 
-      {/* APPLICATIONS */}
-      <div className="applications-section">
+      <PageHeader
+        eyebrow="Tracker"
+        title="My applications"
+        subtitle="Status updates and interview details from recruiters."
+      />
 
-        <h1>
-
-          My Applications
-
-        </h1>
-
-        {applications.length > 0 ? (
-
-          <div className="applications-grid">
-
-            {applications.map((app) => (
-
-              <div
-                className="application-card"
-                key={app._id}
-              >
-
-                <h2>
-
-                  {app.job?.title}
-
-                </h2>
-
-                <p>
-
-                  {app.job?.companyName}
-
-                </p>
-
-                {/* STATUS */}
-                <span className={`status ${app.status}`}>
-
-                  {app.status}
-
-                </span>
-
-                {/* MESSAGE */}
-                {app.message && (
-
-                  <div className="message-box">
-
-                    <FaBell />
-
-                    <p>
-
-                      {app.message}
-
-                    </p>
-
-                  </div>
-                )}
-
-                {/* INTERVIEW */}
-                {app.interviewDate && (
-
-                  <div className="interview-box">
-
-                    <FaCalendarAlt />
-
-                    <div>
-
-                      <p>
-
-                        Interview Scheduled
-
-                      </p>
-
-                      <span>
-
-                        {new Date(
-
-                          app.interviewDate
-
-                        ).toLocaleString()}
-
-                      </span>
-
-                    </div>
-
-                  </div>
-                )}
-
-                {/* INTERVIEW LINK */}
-                {app.interviewLink && (
-
-                  <a
-
-                    href={app.interviewLink}
-
-                    target="_blank"
-
-                    rel="noreferrer"
-
-                    className="meeting-link"
-                  >
-
-                    Join Interview
-
-                  </a>
-                )}
-
+      {applications.length > 0 ? (
+        <div className="grid-cards">
+          {applications.map((app) => (
+            <article key={app._id} className="card app-card">
+              <div className="app-card__header">
+                <h3>{app.job?.title}</h3>
+                <p className="app-card__company">{app.job?.companyName}</p>
               </div>
-            ))}
 
-          </div>
+              <Badge
+                variant={
+                  app.status === "accepted"
+                    ? "success"
+                    : app.status === "rejected"
+                      ? "danger"
+                      : "warning"
+                }
+              >
+                {app.status}
+              </Badge>
 
-        ) : (
+              {app.message && (
+                <div className="message-box">
+                  <FaBell aria-hidden />
+                  <p>{app.message}</p>
+                </div>
+              )}
 
-          <div className="empty-state">
+              {app.interviewDate && (
+                <div className="interview-box">
+                  <FaCalendarAlt aria-hidden />
+                  <div>
+                    <p style={{ fontWeight: 600 }}>Interview scheduled</p>
+                    <span>
+                      {new Date(app.interviewDate).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
 
-            <h2>
+              {app.interviewLink && (
+                <a
+                  href={app.interviewLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="meeting-link"
+                >
+                  Join interview
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title="No applications yet"
+          description="Browse open roles and submit your first application."
+          actionLabel="Browse jobs"
+          onAction={() => navigate("/jobs")}
+        />
+      )}
 
-              No Applications Yet
-
-            </h2>
-
-          </div>
-        )}
-
+      <div style={{ marginTop: "var(--space-12)" }}>
+        <Notifications showPanel />
       </div>
-       
-       <Notifications />
-
     </div>
   );
 }
