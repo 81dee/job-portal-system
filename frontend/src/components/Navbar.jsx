@@ -10,9 +10,12 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
 import Button from "./ui/Button";
+import { useTheme } from "../contexts/useTheme.js";
 import "../assets/styles/navbar.css";
 
 const NAV_ITEMS = [
@@ -47,6 +50,7 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isLoggedIn } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -96,7 +100,18 @@ export default function Navbar() {
           {linkList}
         </nav>
 
-        <div className="navbar__actions">{authActions}</div>
+        <div className="navbar__actions">
+          {authActions}
+          <Button
+            variant="secondary"
+            size="sm"
+            type="button"
+            onClick={toggleTheme}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? <FaSun aria-hidden /> : <FaMoon aria-hidden />}
+          </Button>
+        </div>
 
         <button
           type="button"
@@ -114,6 +129,18 @@ export default function Navbar() {
         <div id="mobile-nav" className="navbar__mobile-panel">
           <nav aria-label="Mobile navigation">{linkList}</nav>
           <div className="navbar__actions">{authActions}</div>
+          <div style={{ padding: "var(--space-4) 0" }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              type="button"
+              onClick={toggleTheme}
+              aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              className="btn--block"
+            >
+              {isDark ? <FaSun aria-hidden /> : <FaMoon aria-hidden />}
+            </Button>
+          </div>
         </div>
       )}
     </header>
