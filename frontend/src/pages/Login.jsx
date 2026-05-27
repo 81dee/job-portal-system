@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { GoogleLogin } from "@react-oauth/google";
 import API from "../services/api";
 import { useAuth } from "../hooks/useAuth";
 import InputField from "../components/ui/InputField";
@@ -30,6 +31,29 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const credential = credentialResponse?.credential;
+      if (!credential) {
+        toast.error("Google login failed");
+        return;
+      }
+
+      const res = await API.post("/auth/google", { credential });
+      setUser(res.data.user, res.data.token);
+      toast.success("Signed in with Google");
+      navigate("/");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Google authentication failed"
+      );
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google sign-in was cancelled or failed");
   };
 
   return (
@@ -67,6 +91,25 @@ export default function Login() {
             {loading ? "Signing in…" : "Sign in"}
           </Button>
         </form>
+
+        <div style={{ margin: "var(--space-6) 0", textAlign: "center" }}>
+          <p
+            style={{
+              color: "var(--color-text-muted)",
+              fontSize: "var(--text-sm)",
+              marginBottom: "var(--space-3)",
+            }}
+          >
+            or continue with Google
+          </p>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+            />
+          </div>
+        </div>
 
         <div className="auth-card__footer">
           <span>Don&apos;t have an account?</span>
