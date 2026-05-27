@@ -1,30 +1,32 @@
 import { useEffect, useState } from "react";
-
 import API from "../services/api";
-
 import {
-
   FaUser,
   FaEnvelope,
   FaCheck,
   FaTimes,
   FaBriefcase,
-  FaCalendarAlt,
-  FaLink
-
+  FaCalendarCheck,
 } from "react-icons/fa";
-
 import toast from "react-hot-toast";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import EmptyState from "../components/ui/EmptyState";
 import { openResume } from "../utils/uploads";
+import { InterviewScheduleFields } from "../components/InterviewCard";
+
+const defaultInterviewFields = {
+  interviewDate: "",
+  interviewTime: "",
+  interviewType: "online",
+  meetingLink: "",
+  notes: "",
+};
 
 export default function RecruiterApplications() {
-
   const [applications, setApplications] = useState([]);
-
+  const [schedulingId, setSchedulingId] = useState(null);
   const token = localStorage.getItem("token");
 
   const handleViewResume = async (app) => {
@@ -35,38 +37,24 @@ export default function RecruiterApplications() {
     }
   };
 
-  // FETCH APPLICATIONS
   const fetchApplications = async () => {
-
     try {
-
-      const res = await API.get(
-
-        "/application/recruiter",
-
-        {
-          headers: {
-
-            Authorization: `Bearer ${token}`
-          }
-        }
+      const res = await API.get("/application/recruiter", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const list = Array.isArray(res.data) ? res.data : [];
+      setApplications(
+        list.map((app) => ({
+          ...app,
+          ...defaultInterviewFields,
+          interviewDate: app.interviewDate
+            ? new Date(app.interviewDate).toISOString().slice(0, 10)
+            : "",
+          interviewTime: app.interviewTime || "",
+        }))
       );
-
-      console.log("APPLICATION DATA:", res.data);
-
-      if (Array.isArray(res.data)) {
-
-        setApplications(res.data);
-
-      } else {
-
-        setApplications([]);
-      }
-
     } catch (error) {
-
       console.log(error);
-
       setApplications([]);
     }
   };
@@ -79,7 +67,19 @@ export default function RecruiterApplications() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!active) return;
-        setApplications(Array.isArray(res.data) ? res.data : []);
+        const list = Array.isArray(res.data) ? res.data : [];
+        setApplications(
+          list.map((app) => ({
+            ...app,
+            interviewType: "online",
+            meetingLink: app.interviewLink || "",
+            notes: "",
+            interviewDate: app.interviewDate
+              ? new Date(app.interviewDate).toISOString().slice(0, 10)
+              : "",
+            interviewTime: "",
+          }))
+        );
       } catch (error) {
         console.log(error);
         if (active) setApplications([]);
@@ -90,166 +90,102 @@ export default function RecruiterApplications() {
     };
   }, [token]);
 
-  // UPDATE STATUS
-  const updateStatus = async (
+  const handleInputChange = (id, field, value) => {
+    setApplications((prev) =>
+      prev.map((app) => (app._id === id ? { ...app, [field]: value } : app))
+    );
+  };
 
-    id,
+  const scheduleInterview = async (app) => {
+    if (!app.interviewDate || !app.interviewTime) {
+      toast.error("Please set interview date and time");
+      return;
+    }
 
-    status,
-
-    message,
-
-    interviewDate,
-
-    interviewLink
-
-  ) => {
-
+    setSchedulingId(app._id);
     try {
-
-      await API.put(
-
-        `/application/status/${id}`,
-
+      const res = await API.post(
+        "/interview/schedule",
         {
-
-          status,
-
-          message,
-
-          interviewDate,
-
-          interviewLink
+          applicationId: app._id,
+          interviewDate: app.interviewDate,
+          interviewTime: app.interviewTime,
+          interviewType: app.interviewType || "online",
+          meetingLink: app.meetingLink || "",
+          notes: app.notes || "",
         },
-
-        {
-
-          headers: {
-
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("Application updated");
-
+      toast.success(
+        res.data.emailSent
+          ? "Interview scheduled — candidate notified by email"
+          : "Interview scheduled — in-app notification sent"
+      );
       fetchApplications();
-
     } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to schedule interview"
+      );
+    } finally {
+      setSchedulingId(null);
+    }
+  };
 
+  const updateStatus = async (id, status, message) => {
+    try {
+      await API.put(
+        `/application/status/${id}`,
+        { status, message, interviewDate: "", interviewLink: "" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Application updated");
+      fetchApplications();
+    } catch (error) {
       console.log(error);
-
       toast.error("Update failed");
     }
   };
 
-  // HANDLE INPUT CHANGE
-  const handleInputChange = ( id, field, value ) => {
-
-    setApplications((prev) =>
-
-      prev.map((app) =>
-
-        app._id === id
-
-          ? {
-
-              ...app,
-
-              [field]: value
-            }
-
-          : app
-      )
-    );
-  };
-
   return (
-
     <div className="page page--dashboard">
-
       <PageHeader
         eyebrow="Hiring"
         title="Job applicants"
-        subtitle="Review applications, schedule interviews, and update status."
+        subtitle="Schedule interviews with date, time, and meeting link. Candidates receive notification and email."
       />
 
       {applications.length > 0 ? (
-
         <div className="grid-cards">
-
           {applications.map((app) => (
-
-            <article
-              className="card application-review-card"
-              key={app._id}
-            >
-
-              {/* USER INFO */}
-              <h2>
-
-                <FaUser />
-
+            <article className="card application-review-card" key={app._id}>
+              <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <FaUser aria-hidden />
                 {app.user?.name}
-
               </h2>
-
               <p>
-
-                <FaEnvelope />
-
-                {app.user?.email}
-
+                <FaEnvelope aria-hidden /> {app.user?.email}
+              </p>
+              <p>
+                <FaBriefcase aria-hidden /> {app.job?.title}
               </p>
 
-              <p>
-
-                <FaBriefcase />
-
-                {app.job?.title}
-
-              </p>
-
-              {/* EXTRA DETAILS */}
               <div className="applicant-details">
-
                 <p>
-
-                  <strong>Phone:</strong>
-
-                  {app.phone || "N/A"}
-
+                  <strong>Phone:</strong> {app.phone || "N/A"}
                 </p>
-
                 <p>
-
-                  <strong>Qualification:</strong>
-
-                  {app.qualification || "N/A"}
-
+                  <strong>Qualification:</strong> {app.qualification || "N/A"}
                 </p>
-
                 <p>
-
-                  <strong>Experience:</strong>
-
-                  {app.experience || "N/A"}
-
+                  <strong>Experience:</strong> {app.experience || "N/A"}
                 </p>
-
                 <p>
-
-                  <strong>Skills:</strong>
-
-                  {app.skills || "N/A"}
-
+                  <strong>Skills:</strong> {app.skills || "N/A"}
                 </p>
-
               </div>
 
-              {/* RESUME */}
               {app.resume && (
-
                 <button
                   type="button"
                   className="meeting-link"
@@ -261,130 +197,53 @@ export default function RecruiterApplications() {
                   }}
                   onClick={() => handleViewResume(app)}
                 >
-
                   View resume
-
                 </button>
               )}
 
-              {/* MESSAGE */}
               <textarea
-
-                placeholder="Message to applicant"
-
+                placeholder="Message to applicant (optional)"
                 value={app.message || ""}
-
                 onChange={(e) =>
-
-                  handleInputChange(
-
-                    app._id,
-
-                    "message",
-
-                    e.target.value
-                  )
+                  handleInputChange(app._id, "message", e.target.value)
                 }
               />
 
-              {/* INTERVIEW DATE */}
-              <div className="input-group">
+              <InterviewScheduleFields
+                values={app}
+                onChange={(field, value) =>
+                  handleInputChange(app._id, field, value)
+                }
+              />
 
-                <FaCalendarAlt />
+              <Button
+                block
+                disabled={schedulingId === app._id}
+                onClick={() => scheduleInterview(app)}
+              >
+                <FaCalendarCheck aria-hidden />
+                {schedulingId === app._id
+                  ? "Scheduling…"
+                  : "Schedule interview & notify"}
+              </Button>
 
-                <input
-
-                  type="datetime-local"
-
-                  value={app.interviewDate || ""}
-
-                  onChange={(e) =>
-
-                    handleInputChange(
-
-                      app._id,
-
-                      "interviewDate",
-
-                      e.target.value
-                    )
-                  }
-                />
-
-              </div>
-
-              {/* INTERVIEW LINK */}
-              <div className="input-group">
-
-                <FaLink />
-
-                <input
-
-                  type="text"
-
-                  placeholder="Interview Link"
-
-                  value={app.interviewLink || ""}
-
-                  onChange={(e) =>
-
-                    handleInputChange(
-
-                      app._id,
-
-                      "interviewLink",
-
-                      e.target.value
-                    )
-                  }
-                />
-
-              </div>
-
-              {/* STATUS */}
               <div className="application-review-card__actions">
-
                 <Button
+                  variant="secondary"
                   onClick={() =>
-
-                    updateStatus(
-
-                      app._id,
-
-                      "accepted",
-
-                      app.message,
-
-                      app.interviewDate,
-
-                      app.interviewLink
-                    )
+                    updateStatus(app._id, "accepted", app.message)
                   }
                 >
-                  <FaCheck aria-hidden /> Accept
+                  <FaCheck aria-hidden /> Accept only
                 </Button>
-
                 <Button
                   variant="danger"
                   onClick={() =>
-
-                    updateStatus(
-
-                      app._id,
-
-                      "rejected",
-
-                      app.message,
-
-                      app.interviewDate,
-
-                      app.interviewLink
-                    )
+                    updateStatus(app._id, "rejected", app.message)
                   }
                 >
                   <FaTimes aria-hidden /> Reject
                 </Button>
-
               </div>
 
               <Badge
@@ -398,16 +257,15 @@ export default function RecruiterApplications() {
               >
                 {app.status}
               </Badge>
-
             </article>
           ))}
-
         </div>
-
       ) : (
-        <EmptyState title="No applications yet" description="Applications will appear here when candidates apply." />
+        <EmptyState
+          title="No applications yet"
+          description="Applications will appear here when candidates apply."
+        />
       )}
-
     </div>
   );
 }

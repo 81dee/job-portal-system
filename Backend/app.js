@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.routes.js";
 import companyRoutes from "./routes/company.routes.js";
 import { protect } from "./middlewares/auth.middleware.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import interviewRoutes from "./routes/interview.routes.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -40,6 +41,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/application", applicationRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/notification", notificationRoutes);
+app.use("/api/interview", interviewRoutes);
 
 // test route
 app.get("/", (req, res) => {

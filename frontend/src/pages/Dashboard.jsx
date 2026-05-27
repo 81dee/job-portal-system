@@ -16,10 +16,12 @@ import PageHeader from "../components/ui/PageHeader";
 import StatCard from "../components/ui/StatCard";
 import Badge from "../components/ui/Badge";
 import EmptyState from "../components/ui/EmptyState";
+import InterviewCard from "../components/InterviewCard";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
+  const [interviews, setInterviews] = useState([]);
   const [stats, setStats] = useState({
     total: 0,
     accepted: 0,
@@ -33,22 +35,25 @@ export default function Dashboard() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [appsRes, statsRes] = await Promise.all([
-          API.get("/application/my", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          API.get("/application/jobseeker-stats", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+        const headers = { Authorization: `Bearer ${token}` };
+        const [appsRes, statsRes, interviewsRes] = await Promise.all([
+          API.get("/application/my", { headers }),
+          API.get("/application/jobseeker-stats", { headers }),
+          API.get("/interview/my", { headers }).catch(() => ({ data: [] })),
         ]);
         setApplications(Array.isArray(appsRes.data) ? appsRes.data : []);
         setStats(statsRes.data);
+        setInterviews(Array.isArray(interviewsRes.data) ? interviewsRes.data : []);
       } catch (error) {
         console.log(error);
       }
     };
     if (token) load();
   }, [token]);
+
+  const upcoming = interviews.filter(
+    (i) => i.status === "scheduled" || i.status === "rescheduled"
+  );
 
   return (
     <div className="page page--dashboard">
@@ -66,36 +71,35 @@ export default function Dashboard() {
       </div>
 
       <div className="grid-stats" style={{ marginBottom: "var(--space-10)" }}>
-        <StatCard
-          icon={FaBriefcase}
-          value={stats.total}
-          label="Total applied"
-          tone="primary"
-        />
-        <StatCard
-          icon={FaCheckCircle}
-          value={stats.accepted}
-          label="Accepted"
-          tone="success"
-        />
-        <StatCard
-          icon={FaTimesCircle}
-          value={stats.rejected}
-          label="Rejected"
-          tone="danger"
-        />
-        <StatCard
-          icon={FaClock}
-          value={stats.pending}
-          label="Pending"
-          tone="warning"
-        />
+        <StatCard icon={FaBriefcase} value={stats.total} label="Total applied" tone="primary" />
+        <StatCard icon={FaCheckCircle} value={stats.accepted} label="Accepted" tone="success" />
+        <StatCard icon={FaTimesCircle} value={stats.rejected} label="Rejected" tone="danger" />
+        <StatCard icon={FaClock} value={stats.pending} label="Pending" tone="warning" />
       </div>
+
+      <PageHeader
+        eyebrow="Interviews"
+        title="Upcoming interviews"
+        subtitle="Dates, times, and meeting links from recruiters."
+      />
+
+      {upcoming.length > 0 ? (
+        <div className="grid-cards" style={{ marginBottom: "var(--space-12)" }}>
+          {upcoming.map((interview) => (
+            <InterviewCard key={interview._id} interview={interview} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title="No interviews scheduled"
+          description="When a recruiter schedules your interview, it will appear here with email and in-app notification."
+        />
+      )}
 
       <PageHeader
         eyebrow="Tracker"
         title="My applications"
-        subtitle="Status updates and interview details from recruiters."
+        subtitle="Status updates and messages from recruiters."
       />
 
       {applications.length > 0 ? (
@@ -131,9 +135,7 @@ export default function Dashboard() {
                   <FaCalendarAlt aria-hidden />
                   <div>
                     <p style={{ fontWeight: 600 }}>Interview scheduled</p>
-                    <span>
-                      {new Date(app.interviewDate).toLocaleString()}
-                    </span>
+                    <span>{new Date(app.interviewDate).toLocaleString()}</span>
                   </div>
                 </div>
               )}
