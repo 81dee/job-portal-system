@@ -112,17 +112,24 @@ export const scheduleInterview = async (req, res) => {
       text: notifyText,
     });
 
-    const emailResult = await sendInterviewEmail({
-      to: candidate.email,
-      candidateName: candidate.name || application.fullName || "Candidate",
-      jobTitle: application.job.title,
-      companyName: application.job.companyName,
-      interviewDate: scheduledAt,
-      interviewTime,
-      interviewType,
-      meetingLink,
-      message: notifyText,
-    });
+    let emailResult = { sent: false, reason: "not_attempted" };
+    try {
+      emailResult = await sendInterviewEmail({
+        to: candidate.email,
+        candidateName: candidate.name || application.fullName || "Candidate",
+        jobTitle: application.job.title,
+        companyName: application.job.companyName,
+        interviewDate: scheduledAt,
+        interviewTime,
+        interviewType,
+        meetingLink,
+        message: notifyText,
+      });
+    } catch (mailErr) {
+      // Email failures should not fail interview scheduling.
+      console.error("Interview email failed:", mailErr.message);
+      emailResult = { sent: false, reason: "email_failed" };
+    }
 
     const populated = await Interview.findById(interview._id)
       .populate("candidateId", "name email")
@@ -134,6 +141,7 @@ export const scheduleInterview = async (req, res) => {
       message: "Interview scheduled successfully",
       interview: populated,
       emailSent: emailResult.sent,
+      emailReason: emailResult.reason || null,
     });
   } catch (err) {
     console.log(err);
