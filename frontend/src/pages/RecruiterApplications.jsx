@@ -132,11 +132,27 @@ export default function RecruiterApplications() {
     }
   };
 
-  const updateStatus = async (id, status, message) => {
+  const updateStatus = async (app, status) => {
     try {
+      const payload =
+        status === "accepted"
+          ? {
+              status,
+              message: app.message,
+              interviewDate: app.interviewDate,
+              // recruiter input uses meetingLink; DB field is interviewLink
+              interviewLink: app.meetingLink,
+            }
+          : {
+              status,
+              message: app.message,
+              interviewDate: "",
+              interviewLink: "",
+            };
+
       await API.put(
-        `/application/status/${id}`,
-        { status, message, interviewDate: "", interviewLink: "" },
+        `/application/status/${app._id}`,
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Application updated");
@@ -231,7 +247,7 @@ export default function RecruiterApplications() {
                 <Button
                   variant="secondary"
                   onClick={() =>
-                    updateStatus(app._id, "accepted", app.message)
+                    updateStatus(app, "accepted")
                   }
                 >
                   <FaCheck aria-hidden /> Accept only
@@ -239,7 +255,7 @@ export default function RecruiterApplications() {
                 <Button
                   variant="danger"
                   onClick={() =>
-                    updateStatus(app._id, "rejected", app.message)
+                    updateStatus(app, "rejected")
                   }
                 >
                   <FaTimes aria-hidden /> Reject
